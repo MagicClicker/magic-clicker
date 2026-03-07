@@ -703,11 +703,58 @@ const DUNGEON_WORLD_SCALING = {
 };
 const initDungeonProgress = () => Object.fromEntries(Object.keys(WORLDS).map(wid => [wid, { bestWave: 0, runs: 0 }]));
 
+const DUNGEON_ENEMIES = {
+  human: [
+    { emoji:"👺", name:"ゴブリン",   bossEmoji:"👹", bossName:"ゴブリン王" },
+    { emoji:"🧟", name:"ゾンビ",     bossEmoji:"💀", bossName:"死霊王" },
+    { emoji:"🐺", name:"ウルフ",     bossEmoji:"🐺", bossName:"フェンリル" },
+    { emoji:"🕷️", name:"大蜘蛛",    bossEmoji:"🕷️", bossName:"クモ魔王" },
+  ],
+  forest: [
+    { emoji:"🐗", name:"イノシシ",   bossEmoji:"🐗", bossName:"猪突大王" },
+    { emoji:"🐍", name:"毒蛇",       bossEmoji:"🐍", bossName:"大蛇神" },
+    { emoji:"🌿", name:"草霊",       bossEmoji:"🌳", bossName:"森の主" },
+    { emoji:"🦊", name:"キツネ霊",   bossEmoji:"🦊", bossName:"九尾の狐" },
+  ],
+  kingdom: [
+    { emoji:"⚔️", name:"騎士",       bossEmoji:"🛡️", bossName:"魔王騎士団長" },
+    { emoji:"🏹", name:"弓兵",       bossEmoji:"🏹", bossName:"闇の射手" },
+    { emoji:"🔮", name:"魔道士",     bossEmoji:"🔮", bossName:"黒魔術師" },
+    { emoji:"👑", name:"衛兵",       bossEmoji:"👑", bossName:"暗黒王" },
+  ],
+  heaven: [
+    { emoji:"⚡", name:"雷精霊",     bossEmoji:"⛈️", bossName:"雷神" },
+    { emoji:"☁️", name:"雲の怪",    bossEmoji:"🌪️", bossName:"嵐の神" },
+    { emoji:"😈", name:"堕天使",     bossEmoji:"😈", bossName:"堕天使長" },
+    { emoji:"✨", name:"光の魔獣",   bossEmoji:"🐉", bossName:"光龍" },
+  ],
+  divine: [
+    { emoji:"🔥", name:"炎獣",       bossEmoji:"🔥", bossName:"業火龍" },
+    { emoji:"⚡", name:"雷獣",       bossEmoji:"⚡", bossName:"雷神獣" },
+    { emoji:"🌊", name:"水霊",       bossEmoji:"🌊", bossName:"海神" },
+    { emoji:"🌟", name:"星精",       bossEmoji:"🌟", bossName:"星神" },
+  ],
+  abyss: [
+    { emoji:"💀", name:"死霊",       bossEmoji:"💀", bossName:"死神" },
+    { emoji:"🦇", name:"吸血蝙蝠",   bossEmoji:"🧛", bossName:"吸血鬼王" },
+    { emoji:"🕷️", name:"地獄蜘蛛",  bossEmoji:"🕸️", bossName:"蜘蛛女王" },
+    { emoji:"😈", name:"悪魔",       bossEmoji:"😈", bossName:"大悪魔" },
+  ],
+  astral: [
+    { emoji:"🌌", name:"星の怪",     bossEmoji:"🌌", bossName:"星界の覇者" },
+    { emoji:"🌠", name:"流星獣",     bossEmoji:"☄️", bossName:"流星龍" },
+    { emoji:"💫", name:"宇宙精霊",   bossEmoji:"🌟", bossName:"宇宙神" },
+    { emoji:"🔯", name:"次元獣",     bossEmoji:"🔯", bossName:"次元王" },
+  ],
+};
+
 const SPELLS = [
-  { id:"spell_arcane_bolt", name:"アーケインボルト", manaCost:0, cooldown:3, desc:"敵に攻撃力×2のダメージ", use:(ctx)=>({ enemyDamage: ctx.attack * 2 }) },
-  { id:"spell_heal", name:"癒しの光", manaCost:0, cooldown:10, desc:"最大HPの25%回復", use:(ctx)=>({ heal: ctx.maxHp * 0.25 }) },
-  { id:"spell_barrier", name:"結界", manaCost:0, cooldown:12, desc:"次の被ダメージを70%軽減", use:()=>({ barrier:0.7, barrierHits:1 }) },
-  { id:"spell_storm", name:"星嵐", manaCost:0, cooldown:16, desc:"敵最大HPの22%固定ダメージ", use:(ctx)=>({ enemyDamage: ctx.enemyMaxHp * 0.22 }) },
+  { id:"spell_arcane_bolt",   name:"アーケインボルト", cooldown:3,  unlockWave:1,  target:"single", desc:"敵一体に攻撃力×3のダメージ",           use:(ctx)=>({ damage: ctx.attack * 3 }) },
+  { id:"spell_heal",          name:"癒しの光",         cooldown:10, unlockWave:1,  target:"self",   desc:"最大HPの25%回復",                       use:(ctx)=>({ heal: ctx.maxHp * 0.25 }) },
+  { id:"spell_chain",         name:"チェインライトニング", cooldown:8, unlockWave:3, target:"all",   desc:"全敵に攻撃力×2のダメージ【Wave3解放】",  use:(ctx)=>({ damage: ctx.attack * 2 }) },
+  { id:"spell_barrier",       name:"結界",             cooldown:12, unlockWave:5,  target:"self",   desc:"次の被ダメを70%軽減×2回【Wave5解放】",   use:()=>({ barrier:0.7, barrierHits:2 }) },
+  { id:"spell_freeze",        name:"氷結",             cooldown:15, unlockWave:7,  target:"all",    desc:"全敵に攻撃力×4＋結界50%×2回【Wave7解放】", use:(ctx)=>({ damage: ctx.attack * 4, barrier:0.50, barrierHits:2 }) },
+  { id:"spell_storm",         name:"星嵐",             cooldown:20, unlockWave:10, target:"all",    desc:"全敵の最大HP30%固定ダメ【Wave10解放】",  use:(ctx)=>({ damage: ctx.totalEnemyMaxHp * 0.30 }) },
 ];
 
 const QUESTS = [
@@ -1091,7 +1138,7 @@ function MagicClicker() {
   const [enchantLevels, setEnchantLevels] = useState({});
 
   const [dungeonProgress, setDungeonProgress] = useState(initDungeonProgress());
-  const [dungeonRun, setDungeonRun] = useState(null); // { worldId, wave, hp, maxHp, enemyHp, enemyMaxHp, enemyAtk, barrier, barrierHits }
+  const [dungeonRun, setDungeonRun] = useState(null); // { worldId, wave, hp, maxHp, enemies:[{id,emoji,name,hp,maxHp,atk}], barrier, barrierHits }
   const [spellCooldowns, setSpellCooldowns] = useState({});
   const [questClaimed, setQuestClaimed] = useState([]);
 
@@ -1386,13 +1433,14 @@ function MagicClicker() {
     return () => clearInterval(t);
   }, []);
 
-  // ダンジョン戦闘: 敵の自動攻撃
+  // ダンジョン戦闘: 敵の自動攻撃（全生存敵の合計ダメージ）
   useEffect(() => {
     if (!dungeonRun) return;
     const t = setInterval(() => {
       setDungeonRun(prev => {
         if (!prev) return prev;
-        let damage = prev.enemyAtk;
+        const totalAtk = (prev.enemies || []).reduce((sum, e) => e.hp > 0 ? sum + e.atk : sum, 0);
+        let damage = totalAtk;
         let barrierHits = prev.barrierHits || 0;
         let barrier = prev.barrier || 0;
         if (barrierHits > 0 && barrier > 0) {
@@ -1468,16 +1516,28 @@ function MagicClicker() {
         audioCtxRef.current = ctx;
         if (ctx.state === "suspended") ctx.resume();
         const t = ctx.currentTime;
-        const o = ctx.createOscillator();
-        const g = ctx.createGain();
-        o.type = "triangle";
-        o.frequency.setValueAtTime(920, t);
-        o.frequency.exponentialRampToValueAtTime(520, t + 0.08);
-        g.gain.setValueAtTime(0.0001, t);
-        g.gain.exponentialRampToValueAtTime(0.07, t + 0.01);
-        g.gain.exponentialRampToValueAtTime(0.0001, t + 0.09);
-        o.connect(g); g.connect(ctx.destination);
-        o.start(t); o.stop(t + 0.1);
+        // メイン音（ベル的なsine波）
+        const o1 = ctx.createOscillator();
+        const g1 = ctx.createGain();
+        o1.type = "sine";
+        o1.frequency.setValueAtTime(660, t);
+        o1.frequency.exponentialRampToValueAtTime(480, t + 0.18);
+        g1.gain.setValueAtTime(0.0001, t);
+        g1.gain.exponentialRampToValueAtTime(0.10, t + 0.008);
+        g1.gain.exponentialRampToValueAtTime(0.0001, t + 0.28);
+        o1.connect(g1); g1.connect(ctx.destination);
+        o1.start(t); o1.stop(t + 0.32);
+        // 倍音（オクターブ上・細め）
+        const o2 = ctx.createOscillator();
+        const g2 = ctx.createGain();
+        o2.type = "sine";
+        o2.frequency.setValueAtTime(1320, t);
+        o2.frequency.exponentialRampToValueAtTime(960, t + 0.12);
+        g2.gain.setValueAtTime(0.0001, t);
+        g2.gain.exponentialRampToValueAtTime(0.035, t + 0.006);
+        g2.gain.exponentialRampToValueAtTime(0.0001, t + 0.18);
+        o2.connect(g2); g2.connect(ctx.destination);
+        o2.start(t); o2.stop(t + 0.22);
       } catch (err) {}
     }
     setIsBouncing(false);
@@ -1614,11 +1674,25 @@ function MagicClicker() {
     return "common_box";
   };
 
-  const buildWaveEnemy = (worldId, wave) => {
+  const buildWaveEnemies = (worldId, wave) => {
     const base = DUNGEON_WORLD_SCALING[worldId] || DUNGEON_WORLD_SCALING.human;
-    const hp = Math.floor(base.hp * Math.pow(1.20, Math.max(0, wave - 1)));
-    const atk = Math.floor(base.atk * Math.pow(1.16, Math.max(0, wave - 1)));
-    return { hp, atk };
+    const isBoss = wave % 10 === 0;
+    const count = isBoss ? 1 : Math.min(3, 1 + Math.floor(wave / 5));
+    const pool = DUNGEON_ENEMIES[worldId] || DUNGEON_ENEMIES.human;
+    const enemies = [];
+    for (let i = 0; i < count; i++) {
+      const tmpl = pool[Math.floor(Math.random() * pool.length)];
+      const hpMult = isBoss ? 4 : (count === 1 ? 1 : 0.6 + i * 0.25);
+      const hp = Math.floor(base.hp * Math.pow(1.20, Math.max(0, wave - 1)) * hpMult);
+      const atk = Math.floor(base.atk * Math.pow(1.16, Math.max(0, wave - 1)) * (isBoss ? 2 : 1));
+      enemies.push({
+        id: i,
+        emoji: isBoss ? tmpl.bossEmoji : tmpl.emoji,
+        name: isBoss ? tmpl.bossName : tmpl.name,
+        hp, maxHp: hp, atk,
+      });
+    }
+    return enemies;
   };
   const calcPlayerDungeonMaxHp = () => {
     return Math.max(120, Math.floor((80 + prestige * 30 + Math.log10(Math.max(1, mana) + 1) * 100) * equipmentMultipliers.mana));
@@ -1648,16 +1722,14 @@ function MagicClicker() {
   };
   const startDungeonRun = (worldId) => {
     const maxHp = calcPlayerDungeonMaxHp();
-    const first = buildWaveEnemy(worldId, 1);
+    const enemies = buildWaveEnemies(worldId, 1);
     setDungeonProgress(prev => ({ ...prev, [worldId]: { ...(prev[worldId] || { bestWave:0, runs:0 }), runs: Number(prev[worldId]?.runs || 0) + 1 } }));
     setDungeonRun({
       worldId,
       wave: 1,
       hp: maxHp,
       maxHp,
-      enemyHp: first.hp,
-      enemyMaxHp: first.hp,
-      enemyAtk: first.atk,
+      enemies,
       barrier: 0,
       barrierHits: 0,
     });
@@ -1670,8 +1742,14 @@ function MagicClicker() {
     if (!dungeonRun) return;
     setDungeonRun(prev => {
       if (!prev) return prev;
-      const nextEnemy = prev.enemyHp - dungeonAttack;
-      if (nextEnemy > 0) return { ...prev, enemyHp: nextEnemy };
+      // 生存している最初の敵を攻撃
+      let hit = false;
+      const enemies = prev.enemies.map(e => {
+        if (!hit && e.hp > 0) { hit = true; return { ...e, hp: Math.max(0, e.hp - dungeonAttack) }; }
+        return e;
+      });
+      const allDead = enemies.every(e => e.hp <= 0);
+      if (!allDead) return { ...prev, enemies };
       const clearedWave = prev.wave;
       addDungeonWaveRewards(prev.worldId, clearedWave);
       setDungeonProgress(dp => {
@@ -1679,8 +1757,7 @@ function MagicClicker() {
         return { ...dp, [prev.worldId]: { ...cur, bestWave: Math.max(Number(cur.bestWave || 0), clearedWave) } };
       });
       const nw = clearedWave + 1;
-      const en = buildWaveEnemy(prev.worldId, nw);
-      return { ...prev, wave: nw, enemyHp: en.hp, enemyMaxHp: en.hp, enemyAtk: en.atk };
+      return { ...prev, wave: nw, enemies: buildWaveEnemies(prev.worldId, nw) };
     });
   };
   const castSpell = (spellId) => {
@@ -1691,24 +1768,35 @@ function MagicClicker() {
     if (Number(spellCooldowns[spellId] || 0) > nowSec) return;
     setDungeonRun(prev => {
       if (!prev) return prev;
+      const totalEnemyMaxHp = prev.enemies.reduce((sum, e) => sum + e.maxHp, 0);
       const result = spell.use({
         attack: dungeonAttack,
         hp: prev.hp,
         maxHp: prev.maxHp,
-        enemyHp: prev.enemyHp,
-        enemyMaxHp: prev.enemyMaxHp,
+        totalEnemyMaxHp,
       }) || {};
       let hp = prev.hp;
-      let enemyHp = prev.enemyHp;
+      let enemies = [...prev.enemies];
       let barrier = prev.barrier || 0;
       let barrierHits = prev.barrierHits || 0;
       if (result.heal) hp = Math.min(prev.maxHp, hp + Number(result.heal));
-      if (result.enemyDamage) enemyHp -= Number(result.enemyDamage);
       if (result.barrier) {
         barrier = Math.max(barrier, Number(result.barrier));
         barrierHits = Math.max(barrierHits, Number(result.barrierHits || 1));
       }
-      if (enemyHp > 0) return { ...prev, hp, enemyHp, barrier, barrierHits };
+      if (result.damage) {
+        if (spell.target === "all") {
+          enemies = enemies.map(e => ({ ...e, hp: Math.max(0, e.hp - result.damage) }));
+        } else {
+          let hit = false;
+          enemies = enemies.map(e => {
+            if (!hit && e.hp > 0) { hit = true; return { ...e, hp: Math.max(0, e.hp - result.damage) }; }
+            return e;
+          });
+        }
+      }
+      const allDead = enemies.every(e => e.hp <= 0);
+      if (!allDead) return { ...prev, hp, enemies, barrier, barrierHits };
       const clearedWave = prev.wave;
       addDungeonWaveRewards(prev.worldId, clearedWave);
       setDungeonProgress(dp => {
@@ -1716,8 +1804,7 @@ function MagicClicker() {
         return { ...dp, [prev.worldId]: { ...cur, bestWave: Math.max(Number(cur.bestWave || 0), clearedWave) } };
       });
       const nw = clearedWave + 1;
-      const en = buildWaveEnemy(prev.worldId, nw);
-      return { ...prev, hp, barrier, barrierHits, wave: nw, enemyHp: en.hp, enemyMaxHp: en.hp, enemyAtk: en.atk };
+      return { ...prev, hp, barrier, barrierHits, wave: nw, enemies: buildWaveEnemies(prev.worldId, nw) };
     });
     setSpellCooldowns(prev => ({ ...prev, [spellId]: nowSec + spell.cooldown }));
   };
@@ -2545,15 +2632,28 @@ function MagicClicker() {
               ) : (
                 <div className="space-y-3">
                   <div className="flex items-center justify-between text-sm">
-                    <span>Wave {dungeonRun.wave}</span>
+                    <span className="font-bold">Wave {dungeonRun.wave}{dungeonRun.wave%10===0?" 👑ボス":""}</span>
                     <button onClick={()=>finishDungeonRun("retreat")} className="px-2 py-1 bg-gray-700 rounded text-xs">撤退</button>
                   </div>
-                  <div className="text-xs">プレイヤーHP {fmt(dungeonRun.hp)} / {fmt(dungeonRun.maxHp)}</div>
-                  <div className="w-full h-2 bg-gray-800 rounded"><div className="h-2 bg-green-400 rounded" style={{width:`${Math.max(0,Math.min(100,dungeonRun.hp/dungeonRun.maxHp*100))}%`}} /></div>
-                  <div className="text-xs">敵HP {fmt(dungeonRun.enemyHp)} / {fmt(dungeonRun.enemyMaxHp)}（攻撃 {fmt(dungeonRun.enemyAtk)}）</div>
-                  <div className="w-full h-2 bg-gray-800 rounded"><div className="h-2 bg-red-400 rounded" style={{width:`${Math.max(0,Math.min(100,dungeonRun.enemyHp/dungeonRun.enemyMaxHp*100))}%`}} /></div>
+                  {/* プレイヤーHP */}
+                  <div className="text-xs text-green-300">🧙 HP {fmt(dungeonRun.hp)} / {fmt(dungeonRun.maxHp)}</div>
+                  <div className="w-full h-2 bg-gray-800 rounded"><div className="h-2 bg-green-400 rounded transition-all" style={{width:`${Math.max(0,Math.min(100,dungeonRun.hp/dungeonRun.maxHp*100))}%`}} /></div>
                   <div className="text-xs text-purple-300">攻撃力: {fmt(dungeonAttack)} / 結界: {dungeonRun.barrierHits>0?`${Math.floor((dungeonRun.barrier||0)*100)}%軽減(${dungeonRun.barrierHits}回)`:"なし"}</div>
-                  <button onClick={attackDungeonEnemy} className="px-4 py-2 bg-yellow-500 hover:bg-yellow-400 rounded font-bold text-black">攻撃する</button>
+                  {/* 敵カード一覧 */}
+                  <div className="flex flex-wrap gap-2">
+                    {(dungeonRun.enemies||[]).map(e => (
+                      <div key={e.id} className={`flex-1 min-w-0 rounded-lg border p-2 text-center transition-all ${e.hp<=0?"border-gray-700 opacity-30 bg-black bg-opacity-20":"border-red-500 bg-black bg-opacity-40"}`}>
+                        <div className="text-3xl">{e.emoji}</div>
+                        <div className="text-xs font-bold truncate mt-1">{e.name}</div>
+                        <div className="text-xs opacity-75">HP {fmt(e.hp)}</div>
+                        <div className="w-full h-1.5 bg-gray-800 rounded mt-1">
+                          <div className="h-1.5 bg-red-400 rounded transition-all" style={{width:`${Math.max(0,Math.min(100,e.hp/e.maxHp*100))}%`}} />
+                        </div>
+                        <div className="text-xs text-orange-300 mt-1">攻 {fmt(e.atk)}</div>
+                      </div>
+                    ))}
+                  </div>
+                  <button onClick={attackDungeonEnemy} className="w-full px-4 py-2 bg-yellow-500 hover:bg-yellow-400 rounded font-bold text-black">⚔️ 攻撃する</button>
                 </div>
               )}
             </div>
@@ -2569,21 +2669,30 @@ function MagicClicker() {
         {/* 魔法タブ */}
         {activeTab==="magic" && (
           <div className="space-y-3">
-            <p className="text-xs opacity-70">魔法はダンジョン戦闘中のみ使用できます。再使用にはクールダウンが必要です。</p>
+            <p className="text-xs opacity-70">魔法はダンジョン戦闘中のみ使用できます。ダンジョンを進めると新しい魔法が解放されます。</p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {SPELLS.map(sp => {
                 const nowSec = Date.now() / 1000;
                 const remain = Math.max(0, Math.ceil((Number(spellCooldowns[sp.id] || 0) - nowSec)));
-                const disabled = !dungeonRun || remain > 0;
+                const unlocked = bestWaveAll >= (sp.unlockWave || 1);
+                const disabled = !dungeonRun || remain > 0 || !unlocked;
+                const targetLabel = sp.target === "all" ? "全体" : sp.target === "self" ? "自分" : "単体";
                 return (
-                  <div key={sp.id} className="bg-black bg-opacity-35 rounded-lg border border-purple-500 p-3">
-                    <div className="font-bold text-purple-200">{sp.name}</div>
-                    <div className="text-xs opacity-75">{sp.desc}</div>
+                  <div key={sp.id} className={`rounded-lg border p-3 transition-all ${unlocked ? "bg-black bg-opacity-35 border-purple-500" : "bg-black bg-opacity-20 border-gray-700 opacity-60"}`}>
+                    <div className="flex items-center justify-between">
+                      <div className="font-bold text-purple-200">{sp.name}</div>
+                      <span className={`text-xs px-1.5 py-0.5 rounded ${sp.target==="all"?"bg-red-700 text-red-200":sp.target==="self"?"bg-green-700 text-green-200":"bg-blue-700 text-blue-200"}`}>{targetLabel}</span>
+                    </div>
+                    <div className="text-xs opacity-75 mt-1">{sp.desc}</div>
                     <div className="text-xs text-cyan-300 mt-1">CD: {sp.cooldown}s {remain>0?`/ 残り ${remain}s`:""}</div>
-                    <button onClick={()=>castSpell(sp.id)} disabled={disabled}
-                      className={`mt-2 px-3 py-1.5 rounded text-sm font-bold ${disabled?"bg-gray-700 text-gray-400 cursor-not-allowed":"bg-purple-500 hover:bg-purple-400 text-black"}`}>
-                      発動
-                    </button>
+                    {!unlocked ? (
+                      <div className="text-xs text-yellow-400 mt-2">🔒 Wave {sp.unlockWave} 到達で解放（現在最高: {bestWaveAll}）</div>
+                    ) : (
+                      <button onClick={()=>castSpell(sp.id)} disabled={disabled}
+                        className={`mt-2 px-3 py-1.5 rounded text-sm font-bold ${disabled?"bg-gray-700 text-gray-400 cursor-not-allowed":"bg-purple-500 hover:bg-purple-400 text-black"}`}>
+                        発動
+                      </button>
+                    )}
                   </div>
                 );
               })}
