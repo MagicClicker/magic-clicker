@@ -1516,28 +1516,25 @@ function MagicClicker() {
         audioCtxRef.current = ctx;
         if (ctx.state === "suspended") ctx.resume();
         const t = ctx.currentTime;
-        // メイン音（ベル的なsine波）
-        const o1 = ctx.createOscillator();
-        const g1 = ctx.createGain();
-        o1.type = "sine";
-        o1.frequency.setValueAtTime(660, t);
-        o1.frequency.exponentialRampToValueAtTime(480, t + 0.18);
-        g1.gain.setValueAtTime(0.0001, t);
-        g1.gain.exponentialRampToValueAtTime(0.10, t + 0.008);
-        g1.gain.exponentialRampToValueAtTime(0.0001, t + 0.28);
-        o1.connect(g1); g1.connect(ctx.destination);
-        o1.start(t); o1.stop(t + 0.32);
-        // 倍音（オクターブ上・細め）
-        const o2 = ctx.createOscillator();
-        const g2 = ctx.createGain();
-        o2.type = "sine";
-        o2.frequency.setValueAtTime(1320, t);
-        o2.frequency.exponentialRampToValueAtTime(960, t + 0.12);
-        g2.gain.setValueAtTime(0.0001, t);
-        g2.gain.exponentialRampToValueAtTime(0.035, t + 0.006);
-        g2.gain.exponentialRampToValueAtTime(0.0001, t + 0.18);
-        o2.connect(g2); g2.connect(ctx.destination);
-        o2.start(t); o2.stop(t + 0.22);
+        // 魔法らしいアルペジオ（音が下から上へ駆け上がる）
+        const magicNotes = [
+          { freq: 622,  gain: 0.09,  delay: 0.000, dur: 0.38 },
+          { freq: 784,  gain: 0.065, delay: 0.030, dur: 0.32 },
+          { freq: 1047, gain: 0.045, delay: 0.060, dur: 0.26 },
+          { freq: 1568, gain: 0.028, delay: 0.085, dur: 0.22 },
+        ];
+        magicNotes.forEach(({ freq, gain: gv, delay, dur }) => {
+          const o = ctx.createOscillator();
+          const g = ctx.createGain();
+          o.type = "sine";
+          o.frequency.setValueAtTime(freq * 0.90, t + delay);
+          o.frequency.exponentialRampToValueAtTime(freq * 1.10, t + delay + dur * 0.55);
+          g.gain.setValueAtTime(0.0001, t + delay);
+          g.gain.exponentialRampToValueAtTime(gv, t + delay + 0.012);
+          g.gain.exponentialRampToValueAtTime(0.0001, t + delay + dur);
+          o.connect(g); g.connect(ctx.destination);
+          o.start(t + delay); o.stop(t + delay + dur + 0.05);
+        });
       } catch (err) {}
     }
     setIsBouncing(false);
