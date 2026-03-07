@@ -748,13 +748,14 @@ const DUNGEON_ENEMIES = {
   ],
 };
 
+// cooldownはターン数
 const SPELLS = [
-  { id:"spell_arcane_bolt",   name:"アーケインボルト", cooldown:3,  unlockWave:1,  target:"single", desc:"敵一体に攻撃力×3のダメージ",           use:(ctx)=>({ damage: ctx.attack * 3 }) },
-  { id:"spell_heal",          name:"癒しの光",         cooldown:10, unlockWave:1,  target:"self",   desc:"最大HPの25%回復",                       use:(ctx)=>({ heal: ctx.maxHp * 0.25 }) },
-  { id:"spell_chain",         name:"チェインライトニング", cooldown:8, unlockWave:3, target:"all",   desc:"全敵に攻撃力×2のダメージ【Wave3解放】",  use:(ctx)=>({ damage: ctx.attack * 2 }) },
-  { id:"spell_barrier",       name:"結界",             cooldown:12, unlockWave:5,  target:"self",   desc:"次の被ダメを70%軽減×2回【Wave5解放】",   use:()=>({ barrier:0.7, barrierHits:2 }) },
-  { id:"spell_freeze",        name:"氷結",             cooldown:15, unlockWave:7,  target:"all",    desc:"全敵に攻撃力×4＋結界50%×2回【Wave7解放】", use:(ctx)=>({ damage: ctx.attack * 4, barrier:0.50, barrierHits:2 }) },
-  { id:"spell_storm",         name:"星嵐",             cooldown:20, unlockWave:10, target:"all",    desc:"全敵の最大HP30%固定ダメ【Wave10解放】",  use:(ctx)=>({ damage: ctx.totalEnemyMaxHp * 0.30 }) },
+  { id:"spell_arcane_bolt",   name:"アーケインボルト", cooldown:1,  unlockWave:1,  target:"single", desc:"敵一体に攻撃力×3のダメージ",              use:(ctx)=>({ damage: ctx.attack * 3 }) },
+  { id:"spell_heal",          name:"癒しの光",         cooldown:3,  unlockWave:1,  target:"self",   desc:"最大HPの25%回復",                         use:(ctx)=>({ heal: ctx.maxHp * 0.25 }) },
+  { id:"spell_chain",         name:"チェインライトニング", cooldown:2, unlockWave:3, target:"all",   desc:"全敵に攻撃力×2のダメージ【Wave3解放】",   use:(ctx)=>({ damage: ctx.attack * 2 }) },
+  { id:"spell_barrier",       name:"結界",             cooldown:3,  unlockWave:5,  target:"self",   desc:"次の被ダメを70%軽減×2回【Wave5解放】",    use:()=>({ barrier:0.7, barrierHits:2 }) },
+  { id:"spell_freeze",        name:"氷結",             cooldown:4,  unlockWave:7,  target:"all",    desc:"全敵に攻撃力×4＋結界50%×2回【Wave7解放】",use:(ctx)=>({ damage: ctx.attack * 4, barrier:0.50, barrierHits:2 }) },
+  { id:"spell_storm",         name:"星嵐",             cooldown:5,  unlockWave:10, target:"all",    desc:"全敵の最大HP30%固定ダメ【Wave10解放】",   use:(ctx)=>({ damage: ctx.totalEnemyMaxHp * 0.30 }) },
 ];
 
 const QUESTS = [
@@ -1433,44 +1434,34 @@ function MagicClicker() {
     return () => clearInterval(t);
   }, []);
 
-  // ダンジョン戦闘: 敵の自動攻撃（全生存敵の合計ダメージ）
-  useEffect(() => {
-    if (!dungeonRun) return;
-    const t = setInterval(() => {
-      setDungeonRun(prev => {
-        if (!prev) return prev;
-        const totalAtk = (prev.enemies || []).reduce((sum, e) => e.hp > 0 ? sum + e.atk : sum, 0);
-        let damage = totalAtk;
-        let barrierHits = prev.barrierHits || 0;
-        let barrier = prev.barrier || 0;
-        if (barrierHits > 0 && barrier > 0) {
-          damage = Math.max(1, Math.floor(damage * (1 - barrier)));
-          barrierHits -= 1;
-          if (barrierHits <= 0) barrier = 0;
-        }
-        const hp = prev.hp - damage;
-        if (hp > 0) return { ...prev, hp, barrier, barrierHits };
-        setTimeout(() => finishDungeonRun("dead"), 0);
-        return null;
-      });
-    }, 1400);
-    return () => clearInterval(t);
-  }, [dungeonRun]);
+  // ターン制: 敵の反撃ヘルパー（プレイヤー行動後に呼び出す）
+  const applyEnemyCounterattack = (prev) => {
+    if (!prev) return prev;
+    const totalAtk = prev.enemies.reduce((sum, e) => e.hp > 0 ? sum + e.atk : sum, 0);
+    let damage = totalAtk;
+    let barrierHits = prev.barrierHits || 0;
+    let barrier = prev.barrier || 0;
+    if (barrierHits > 0 && barrier > 0) {
+      damage = Math.max(1, Math.floor(damage * (1 - barrier)));
+      barrierHits--;
+      if (barrierHits <= 0) barrier = 0;
+    }
+    const hp = prev.hp - damage;
+    if (hp <= 0) {
+      setTimeout(() => finishDungeonRun("dead"), 0);
+      return null;
+    }
+    return { ...prev, hp, barrier, barrierHits };
+  };
 
-  // スキルクールダウンの自然掃除
-  useEffect(() => {
-    const t = setInterval(() => {
-      const nowSec = Date.now() / 1000;
-      setSpellCooldowns(prev => {
-        const next = {};
-        Object.entries(prev || {}).forEach(([k, v]) => {
-          if (Number(v) > nowSec) next[k] = v;
-        });
-        return next;
-      });
-    }, 1000);
-    return () => clearInterval(t);
-  }, []);
+  // クールダウンを1ターン減らすヘルパー
+  const decrementCooldowns = () => {
+    setSpellCooldowns(prev => {
+      const next = {};
+      Object.entries(prev || {}).forEach(([k, v]) => { if (v > 1) next[k] = v - 1; });
+      return next;
+    });
+  };
 
   // 自動セーブ
   useEffect(() => {
@@ -1739,39 +1730,37 @@ function MagicClicker() {
     if (!dungeonRun) return;
     setDungeonRun(prev => {
       if (!prev) return prev;
-      // 生存している最初の敵を攻撃
+      // プレイヤーターン: 最初の生存敵を攻撃
       let hit = false;
       const enemies = prev.enemies.map(e => {
         if (!hit && e.hp > 0) { hit = true; return { ...e, hp: Math.max(0, e.hp - dungeonAttack) }; }
         return e;
       });
-      const allDead = enemies.every(e => e.hp <= 0);
-      if (!allDead) return { ...prev, enemies };
-      const clearedWave = prev.wave;
-      addDungeonWaveRewards(prev.worldId, clearedWave);
-      setDungeonProgress(dp => {
-        const cur = dp[prev.worldId] || { bestWave:0, runs:0 };
-        return { ...dp, [prev.worldId]: { ...cur, bestWave: Math.max(Number(cur.bestWave || 0), clearedWave) } };
-      });
-      const nw = clearedWave + 1;
-      return { ...prev, wave: nw, enemies: buildWaveEnemies(prev.worldId, nw) };
+      // Wave撃破判定
+      if (enemies.every(e => e.hp <= 0)) {
+        const clearedWave = prev.wave;
+        addDungeonWaveRewards(prev.worldId, clearedWave);
+        setDungeonProgress(dp => {
+          const cur = dp[prev.worldId] || { bestWave:0, runs:0 };
+          return { ...dp, [prev.worldId]: { ...cur, bestWave: Math.max(Number(cur.bestWave || 0), clearedWave) } };
+        });
+        const nw = clearedWave + 1;
+        return { ...prev, wave: nw, enemies: buildWaveEnemies(prev.worldId, nw), barrier: 0, barrierHits: 0 };
+      }
+      // 敵ターン: 反撃
+      return applyEnemyCounterattack({ ...prev, enemies });
     });
+    decrementCooldowns();
   };
   const castSpell = (spellId) => {
     if (!dungeonRun) return;
     const spell = SPELLS.find(s => s.id === spellId);
     if (!spell) return;
-    const nowSec = Date.now() / 1000;
-    if (Number(spellCooldowns[spellId] || 0) > nowSec) return;
+    if ((spellCooldowns[spellId] || 0) > 0) return;
     setDungeonRun(prev => {
       if (!prev) return prev;
       const totalEnemyMaxHp = prev.enemies.reduce((sum, e) => sum + e.maxHp, 0);
-      const result = spell.use({
-        attack: dungeonAttack,
-        hp: prev.hp,
-        maxHp: prev.maxHp,
-        totalEnemyMaxHp,
-      }) || {};
+      const result = spell.use({ attack: dungeonAttack, hp: prev.hp, maxHp: prev.maxHp, totalEnemyMaxHp }) || {};
       let hp = prev.hp;
       let enemies = [...prev.enemies];
       let barrier = prev.barrier || 0;
@@ -1792,18 +1781,27 @@ function MagicClicker() {
           });
         }
       }
-      const allDead = enemies.every(e => e.hp <= 0);
-      if (!allDead) return { ...prev, hp, enemies, barrier, barrierHits };
-      const clearedWave = prev.wave;
-      addDungeonWaveRewards(prev.worldId, clearedWave);
-      setDungeonProgress(dp => {
-        const cur = dp[prev.worldId] || { bestWave:0, runs:0 };
-        return { ...dp, [prev.worldId]: { ...cur, bestWave: Math.max(Number(cur.bestWave || 0), clearedWave) } };
-      });
-      const nw = clearedWave + 1;
-      return { ...prev, hp, barrier, barrierHits, wave: nw, enemies: buildWaveEnemies(prev.worldId, nw) };
+      // Wave撃破判定
+      if (enemies.every(e => e.hp <= 0)) {
+        const clearedWave = prev.wave;
+        addDungeonWaveRewards(prev.worldId, clearedWave);
+        setDungeonProgress(dp => {
+          const cur = dp[prev.worldId] || { bestWave:0, runs:0 };
+          return { ...dp, [prev.worldId]: { ...cur, bestWave: Math.max(Number(cur.bestWave || 0), clearedWave) } };
+        });
+        const nw = clearedWave + 1;
+        return { ...prev, hp, barrier, barrierHits, wave: nw, enemies: buildWaveEnemies(prev.worldId, nw) };
+      }
+      // 敵ターン: 反撃
+      return applyEnemyCounterattack({ ...prev, hp, enemies, barrier, barrierHits });
     });
-    setSpellCooldowns(prev => ({ ...prev, [spellId]: nowSec + spell.cooldown }));
+    // 使用した魔法のCDセット、他はデクリメント
+    setSpellCooldowns(prev => {
+      const next = {};
+      Object.entries(prev || {}).forEach(([k, v]) => { if (v > 1) next[k] = v - 1; });
+      next[spellId] = spell.cooldown;
+      return next;
+    });
   };
   const claimQuest = (questId) => {
     if (claimedQuestSet.has(questId)) return;
@@ -2377,7 +2375,6 @@ function MagicClicker() {
             {id:"game", icon:TAB_ICON_URLS.game, label:`${world.name}の儀式`},
             {id:"worlds", icon:TAB_ICON_URLS.worlds, label:"世界巡歴"},
             {id:"dungeon", icon:TAB_ICON_URLS.dungeon, label:"ダンジョン"},
-            {id:"magic", icon:TAB_ICON_URLS.magic, label:"魔法"},
             {id:"quests", icon:TAB_ICON_URLS.quests, label:"クエスト"},
             {id:"exams", icon:TAB_ICON_URLS.exams, label:"魔法試練"},
             {id:"equipment", icon:TAB_ICON_URLS.equipment, label:"装備"},
@@ -2651,6 +2648,35 @@ function MagicClicker() {
                     ))}
                   </div>
                   <button onClick={attackDungeonEnemy} className="w-full px-4 py-2 bg-yellow-500 hover:bg-yellow-400 rounded font-bold text-black">⚔️ 攻撃する</button>
+                  {/* 魔法ボタン（戦闘中のみ表示） */}
+                  <div className="mt-3 border-t border-purple-800 pt-3">
+                    <div className="text-xs text-purple-300 mb-2">✨ 魔法（1行動 = 1ターン消費）</div>
+                    <div className="grid grid-cols-2 gap-2">
+                      {SPELLS.map(sp => {
+                        const remain = spellCooldowns[sp.id] || 0;
+                        const unlocked = bestWaveAll >= (sp.unlockWave || 1);
+                        const disabled = remain > 0 || !unlocked;
+                        const targetLabel = sp.target === "all" ? "全体" : sp.target === "self" ? "自分" : "単体";
+                        return (
+                          <div key={sp.id} className={`rounded border p-2 transition-all ${unlocked ? "border-purple-600 bg-black bg-opacity-30" : "border-gray-700 opacity-40"}`}>
+                            <div className="flex items-center justify-between mb-1">
+                              <span className="text-xs font-bold text-purple-200">{sp.name}</span>
+                              <span className={`text-xs px-1 rounded ${sp.target==="all"?"bg-red-700 text-red-200":sp.target==="self"?"bg-green-700 text-green-200":"bg-blue-700 text-blue-200"}`}>{targetLabel}</span>
+                            </div>
+                            <div className="text-xs opacity-60 mb-1 leading-tight">{sp.desc.replace(/【.+】/,"")}</div>
+                            {!unlocked ? (
+                              <div className="text-xs text-yellow-400">🔒 Wave{sp.unlockWave}</div>
+                            ) : (
+                              <button onClick={()=>castSpell(sp.id)} disabled={disabled}
+                                className={`w-full py-1 rounded text-xs font-bold ${disabled?`bg-gray-700 text-gray-400 cursor-not-allowed`:"bg-purple-500 hover:bg-purple-400 text-black"}`}>
+                                {remain > 0 ? `CD ${remain}T` : "発動"}
+                              </button>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
                 </div>
               )}
             </div>
@@ -2659,40 +2685,6 @@ function MagicClicker() {
               <div className="text-xs opacity-80 mt-1">
                 Common {(DUNGEON_WAVE_BOX_RATES.common*100).toFixed(1)}% / Uncommon {(DUNGEON_WAVE_BOX_RATES.uncommon*100).toFixed(1)}% / Rare {(DUNGEON_WAVE_BOX_RATES.rare*100).toFixed(1)}% / Epic {(DUNGEON_WAVE_BOX_RATES.epic*100).toFixed(1)}% / Legendary {(DUNGEON_WAVE_BOX_RATES.legendary*100).toFixed(1)}%
               </div>
-            </div>
-          </div>
-        )}
-
-        {/* 魔法タブ */}
-        {activeTab==="magic" && (
-          <div className="space-y-3">
-            <p className="text-xs opacity-70">魔法はダンジョン戦闘中のみ使用できます。ダンジョンを進めると新しい魔法が解放されます。</p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {SPELLS.map(sp => {
-                const nowSec = Date.now() / 1000;
-                const remain = Math.max(0, Math.ceil((Number(spellCooldowns[sp.id] || 0) - nowSec)));
-                const unlocked = bestWaveAll >= (sp.unlockWave || 1);
-                const disabled = !dungeonRun || remain > 0 || !unlocked;
-                const targetLabel = sp.target === "all" ? "全体" : sp.target === "self" ? "自分" : "単体";
-                return (
-                  <div key={sp.id} className={`rounded-lg border p-3 transition-all ${unlocked ? "bg-black bg-opacity-35 border-purple-500" : "bg-black bg-opacity-20 border-gray-700 opacity-60"}`}>
-                    <div className="flex items-center justify-between">
-                      <div className="font-bold text-purple-200">{sp.name}</div>
-                      <span className={`text-xs px-1.5 py-0.5 rounded ${sp.target==="all"?"bg-red-700 text-red-200":sp.target==="self"?"bg-green-700 text-green-200":"bg-blue-700 text-blue-200"}`}>{targetLabel}</span>
-                    </div>
-                    <div className="text-xs opacity-75 mt-1">{sp.desc}</div>
-                    <div className="text-xs text-cyan-300 mt-1">CD: {sp.cooldown}s {remain>0?`/ 残り ${remain}s`:""}</div>
-                    {!unlocked ? (
-                      <div className="text-xs text-yellow-400 mt-2">🔒 Wave {sp.unlockWave} 到達で解放（現在最高: {bestWaveAll}）</div>
-                    ) : (
-                      <button onClick={()=>castSpell(sp.id)} disabled={disabled}
-                        className={`mt-2 px-3 py-1.5 rounded text-sm font-bold ${disabled?"bg-gray-700 text-gray-400 cursor-not-allowed":"bg-purple-500 hover:bg-purple-400 text-black"}`}>
-                        発動
-                      </button>
-                    )}
-                  </div>
-                );
-              })}
             </div>
           </div>
         )}
