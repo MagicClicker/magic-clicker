@@ -290,65 +290,65 @@ const pxIcon = (name, color = "e2e8f0", size = 18) => makePixelIcon(name, color,
 const localIconPath = (group, id) => `assets/icons/${group}/${id}.png`;
 
 const TAB_ICON_URLS = {
-  game: pxIcon("wand", "f59e0b"),
-  worlds: pxIcon("map", "22d3ee"),
-  dungeon: pxIcon("sword", "f87171"),
-  magic: pxIcon("spark", "c084fc"),
-  quests: pxIcon("scroll", "34d399"),
-  exams: pxIcon("book", "a78bfa"),
-  equipment: pxIcon("shield-sword", "fda4af"),
-  crafting: pxIcon("flask", "34d399"),
-  inventory: pxIcon("archive", "fbbf24"),
-  scoreboard: pxIcon("trophy", "facc15"),
+  game:       "✨",
+  worlds:     "🌍",
+  dungeon:    "⚔️",
+  magic:      "🔮",
+  quests:     "📜",
+  exams:      "📚",
+  equipment:  "🛡️",
+  crafting:   "⚗️",
+  inventory:  "🎒",
+  scoreboard: "🏆",
 };
 
 const UI_PIXEL_ICONS = {
-  wizard: pxIcon("user", "fbbf24", 28),
-  start: pxIcon("play", "facc15"),
-  check: pxIcon("check", "86efac"),
-  close: pxIcon("close", "fca5a5"),
-  edit: pxIcon("edit", "c4b5fd"),
-  click: pxIcon("mouse", "93c5fd"),
-  crystal: pxIcon("star", "67e8f9"),
-  soul: pxIcon("moon-star", "c4b5fd"),
-  prestige: pxIcon("reload", "fdba74"),
-  world: pxIcon("globe", "22d3ee"),
-  exam: pxIcon("book", "a78bfa"),
-  dungeon: pxIcon("sword", "f87171"),
-  magic: pxIcon("spark", "c084fc"),
-  quest: pxIcon("scroll", "34d399"),
-  equipment: pxIcon("shield", "fda4af"),
-  potion: pxIcon("flask", "34d399"),
-  box: pxIcon("archive", "fbbf24"),
-  score: pxIcon("trophy", "facc15"),
-  sound: pxIcon("volume-3", "67e8f9"),
-  achievement: pxIcon("medal", "fcd34d"),
-  ad: pxIcon("announcement", "34d399"),
-  lock: pxIcon("lock", "94a3b8"),
-  gift: pxIcon("gift", "86efac"),
-  reset: pxIcon("reload", "fca5a5"),
-  end: pxIcon("flag", "fcd34d"),
+  wizard:      "🧙",
+  start:       "▶️",
+  check:       "✅",
+  close:       "❌",
+  edit:        "✏️",
+  click:       "👆",
+  crystal:     "💎",
+  soul:        "💜",
+  prestige:    "🔄",
+  world:       "🌍",
+  exam:        "📚",
+  dungeon:     "⚔️",
+  magic:       "✨",
+  quest:       "📜",
+  equipment:   "🛡️",
+  potion:      "⚗️",
+  box:         "📦",
+  score:       "🏆",
+  sound:       "🔊",
+  achievement: "🏅",
+  ad:          "📢",
+  lock:        "🔒",
+  gift:        "🎁",
+  reset:       "🔄",
+  end:         "🏁",
 };
 
 const WORLD_PIXEL_ICONS = {
-  human: pxIcon("home", "f59e0b", 20),
-  forest: pxIcon("tree", "86efac", 20),
-  kingdom: pxIcon("castle", "93c5fd", 20),
-  heaven: pxIcon("cloud", "bae6fd", 20),
-  divine: pxIcon("bolt", "fde047", 20),
-  abyss: pxIcon("moon", "a5b4fc", 20),
-  astral: pxIcon("stars", "67e8f9", 20),
+  human:   "🏘️",
+  forest:  "🌲",
+  kingdom: "🏰",
+  heaven:  "☁️",
+  divine:  "⚡",
+  abyss:   "🕳️",
+  astral:  "🌌",
 };
 
 const EXAM_PIXEL_ICONS = {
-  1: pxIcon("book", "c4b5fd", 20),
-  2: pxIcon("book-open", "c4b5fd", 20),
-  3: pxIcon("wand", "a78bfa", 20),
-  4: pxIcon("medal", "facc15", 20),
-  5: pxIcon("bolt", "fde047", 20),
-  6: pxIcon("moon-star", "93c5fd", 20),
-  7: pxIcon("skull", "94a3b8", 20),
-  8: pxIcon("stars", "67e8f9", 20),
+  1: "📖",
+  2: "📗",
+  3: "🪄",
+  4: "🥇",
+  5: "⚡",
+  6: "🌙",
+  7: "💀",
+  8: "🌟",
 };
 
 const ICON_NAME_POOL = ["sparkle", "star", "diamond", "flask", "book", "shield", "sword", "gem", "leaf", "tree"];
@@ -1040,16 +1040,23 @@ const openBox = (boxId) => {
 function MagicClicker() {
   const PixelIcon = ({ src, alt, className = "w-4 h-4" }) => {
     const srcStr = String(src || "");
-    const seed = String(src || alt || "pixel-icon");
-    const srcFailed = !!srcStr && failedIconSrcRef.current.has(srcStr);
-    const canUseImage = !!srcStr && (srcStr.startsWith("http") || srcStr.startsWith("/") || srcStr.startsWith("assets/") || srcStr.startsWith("data:"));
-    if (canUseImage && !srcFailed) {
+    // emoji文字列の場合はspanで表示
+    if (srcStr && !srcStr.startsWith("data:") && !srcStr.startsWith("http") && !srcStr.startsWith("/") && !srcStr.startsWith("assets/")) {
       return (
-        <img
-          src={srcStr}
-          alt={alt}
-          className={className}
-          style={{ imageRendering: "pixelated" }}
+        <span
+          className={`inline-flex items-center justify-center select-none ${className}`}
+          style={{ fontSize: "1em", lineHeight: 1 }}
+          aria-label={alt}
+        >
+          {srcStr}
+        </span>
+      );
+    }
+    const seed = String(src || alt || "pixel-icon");
+    const canUseImage = !!srcStr && (srcStr.startsWith("http") || srcStr.startsWith("/") || srcStr.startsWith("assets/") || srcStr.startsWith("data:"));
+    if (canUseImage && !failedIconSrcRef.current.has(srcStr)) {
+      return (
+        <img src={srcStr} alt={alt} className={className} style={{ imageRendering: "pixelated" }}
           onError={(e) => {
             if (srcStr) failedIconSrcRef.current.add(srcStr);
             e.currentTarget.onerror = null;
@@ -1058,34 +1065,7 @@ function MagicClicker() {
         />
       );
     }
-    const h = hashCode(seed);
-    const c1 = ICON_COLOR_POOL[h % ICON_COLOR_POOL.length];
-    const c2 = shiftColor(c1, 55);
-    const c3 = shiftColor(c1, -55);
-    const cells = [];
-    for (let y = 0; y < 8; y += 1) {
-      for (let x = 0; x < 4; x += 1) {
-        const bit = (h >> ((x + y * 4) % 24)) & 1;
-        if (!bit) continue;
-        const tone = ((h >> ((x * 3 + y) % 10)) & 1) ? c2 : c1;
-        cells.push({ x, y, fill: tone });
-        cells.push({ x: 7 - x, y, fill: tone });
-      }
-    }
-    return (
-      <svg
-        viewBox="0 0 8 8"
-        aria-label={alt}
-        className={className}
-        style={{ imageRendering: "pixelated" }}
-        shapeRendering="crispEdges"
-      >
-        <rect x="0" y="0" width="8" height="8" fill={`#${c3}`} opacity="0.18" />
-        {cells.map((cell, i) => (
-          <rect key={`${cell.x}_${cell.y}_${i}`} x={cell.x} y={cell.y} width="1" height="1" fill={`#${cell.fill}`} />
-        ))}
-      </svg>
-    );
+    return <img src={pxIcon(seed, "c084fc", 18)} alt={alt} className={className} style={{ imageRendering: "pixelated" }} />;
   };
   const getWorldIcon = (worldId) => WORLD_PIXEL_ICONS[worldId] || dynamicPixelIcon(`world_${worldId}`, 20);
   const getExamIcon = (examId) => EXAM_PIXEL_ICONS[examId] || dynamicPixelIcon(`exam_${examId}`, 20);
@@ -2383,10 +2363,9 @@ function MagicClicker() {
             {id:"scoreboard", icon:TAB_ICON_URLS.scoreboard, label:"スコアボード"},
           ].map(tab=>(
             <button key={tab.id} onClick={()=>setActiveTab(tab.id)}
-              className={`px-3 py-1.5 rounded-lg font-bold text-xs transition-all flex items-center gap-1.5 ${activeTab===tab.id?"bg-yellow-500 text-black":"bg-black bg-opacity-30 hover:bg-opacity-50"}`}>
-              <span className="tab-illustration">
-                <PixelIcon src={tab.icon} alt={tab.label} className="w-4 h-4" />
-              </span>
+              className={`px-3 py-1.5 rounded-lg font-bold text-xs transition-all flex items-center gap-1.5 ${activeTab===tab.id?"bg-yellow-400 text-black shadow-lg scale-105":"bg-white bg-opacity-10 hover:bg-opacity-20 text-white"}`}
+              style={activeTab===tab.id?{boxShadow:"0 0 12px rgba(250,204,21,0.5)"}:{}}>
+              <span style={{fontSize:"1.1em"}}>{tab.icon}</span>
               <span>{tab.label}</span>
             </button>
           ))}
@@ -2648,30 +2627,49 @@ function MagicClicker() {
                     ))}
                   </div>
                   <button onClick={attackDungeonEnemy} className="w-full px-4 py-2 bg-yellow-500 hover:bg-yellow-400 rounded font-bold text-black">⚔️ 攻撃する</button>
-                  {/* 魔法ボタン（戦闘中のみ表示） */}
+                  {/* 魔法パネル（戦闘中のみ表示） */}
                   <div className="mt-3 border-t border-purple-800 pt-3">
-                    <div className="text-xs text-purple-300 mb-2">✨ 魔法（1行動 = 1ターン消費）</div>
+                    <div className="text-xs text-purple-300 mb-2">🔮 魔法スキル</div>
                     <div className="grid grid-cols-2 gap-2">
                       {SPELLS.map(sp => {
                         const remain = spellCooldowns[sp.id] || 0;
                         const unlocked = bestWaveAll >= (sp.unlockWave || 1);
-                        const disabled = remain > 0 || !unlocked;
-                        const targetLabel = sp.target === "all" ? "全体" : sp.target === "self" ? "自分" : "単体";
+                        const ready = unlocked && remain === 0;
+                        const cdPct = remain > 0 ? Math.round((remain / sp.cooldown) * 100) : 0;
+                        const targetColor = sp.target==="all"?"text-red-300 border-red-700":sp.target==="self"?"text-green-300 border-green-700":"text-blue-300 border-blue-700";
+                        const targetLabel = sp.target === "all" ? "全体" : sp.target === "self" ? "回復" : "単体";
                         return (
-                          <div key={sp.id} className={`rounded border p-2 transition-all ${unlocked ? "border-purple-600 bg-black bg-opacity-30" : "border-gray-700 opacity-40"}`}>
-                            <div className="flex items-center justify-between mb-1">
-                              <span className="text-xs font-bold text-purple-200">{sp.name}</span>
-                              <span className={`text-xs px-1 rounded ${sp.target==="all"?"bg-red-700 text-red-200":sp.target==="self"?"bg-green-700 text-green-200":"bg-blue-700 text-blue-200"}`}>{targetLabel}</span>
-                            </div>
-                            <div className="text-xs opacity-60 mb-1 leading-tight">{sp.desc.replace(/【.+】/,"")}</div>
-                            {!unlocked ? (
-                              <div className="text-xs text-yellow-400">🔒 Wave{sp.unlockWave}</div>
-                            ) : (
-                              <button onClick={()=>castSpell(sp.id)} disabled={disabled}
-                                className={`w-full py-1 rounded text-xs font-bold ${disabled?`bg-gray-700 text-gray-400 cursor-not-allowed`:"bg-purple-500 hover:bg-purple-400 text-black"}`}>
-                                {remain > 0 ? `CD ${remain}T` : "発動"}
-                              </button>
+                          <div key={sp.id} className={`rounded-lg border p-2 transition-all relative overflow-hidden ${!unlocked?"border-gray-700 bg-black bg-opacity-20 opacity-50":ready?"border-purple-400 bg-purple-900 bg-opacity-30":"border-gray-600 bg-black bg-opacity-30"}`}>
+                            {/* クールダウンバー（発動済み時） */}
+                            {unlocked && remain > 0 && (
+                              <div className="absolute inset-0 pointer-events-none">
+                                <div className="h-full bg-gray-700 bg-opacity-60 transition-all"
+                                  style={{width:`${cdPct}%`}} />
+                              </div>
                             )}
+                            <div className="relative z-10">
+                              <div className="flex items-center justify-between mb-1">
+                                <span className={`text-xs font-bold ${ready?"text-purple-200":"text-gray-400"}`}>{sp.name}</span>
+                                <span className={`text-xs border px-1 rounded ${targetColor}`}>{targetLabel}</span>
+                              </div>
+                              <div className="text-xs opacity-55 mb-1 leading-tight">{sp.desc.replace(/【.+】/,"")}</div>
+                              {!unlocked ? (
+                                <div className="text-xs text-yellow-400 font-bold">🔒 Wave{sp.unlockWave}で解放</div>
+                              ) : remain > 0 ? (
+                                <div className="flex items-center gap-1">
+                                  <div className="flex-1 h-1.5 bg-gray-700 rounded overflow-hidden">
+                                    <div className="h-full bg-purple-500 transition-all" style={{width:`${100 - cdPct}%`}} />
+                                  </div>
+                                  <span className="text-xs text-gray-400 font-bold">{remain}T</span>
+                                </div>
+                              ) : (
+                                <button onClick={()=>castSpell(sp.id)}
+                                  className="w-full py-1 rounded text-xs font-bold bg-purple-500 hover:bg-purple-400 text-black"
+                                  style={{boxShadow:"0 0 8px rgba(168,85,247,0.5)"}}>
+                                  ✨ 発動
+                                </button>
+                              )}
+                            </div>
                           </div>
                         );
                       })}
