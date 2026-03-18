@@ -169,15 +169,44 @@
     .dc-spell-locked  { border:1px solid rgba(50,40,40,0.4); background:rgba(10,5,5,0.5); opacity:0.45; }
 
     /* Upgrade tier border colors */
-    .dc-tier-1 { border-left: 3px solid #555; }
-    .dc-tier-2 { border-left: 3px solid #2e7d32; }
-    .dc-tier-3 { border-left: 3px solid #1565c0; }
-    .dc-tier-4 { border-left: 3px solid #6a1b9a; }
-    .dc-tier-5 { border-left: 3px solid #c8922a; }
-    .dc-tier-6 { border-left: 3px solid #b71c1c; }
+    .dc-tier-1 { border-left: 3px solid #555 !important; }
+    .dc-tier-2 { border-left: 3px solid #2e7d32 !important; }
+    .dc-tier-3 { border-left: 3px solid #1565c0 !important; }
+    .dc-tier-4 { border-left: 3px solid #6a1b9a !important; }
+    .dc-tier-5 { border-left: 3px solid #c8922a !important; }
+    .dc-tier-6 { border-left: 3px solid #b71c1c !important; }
+
+    /* Upgrade card (shop) */
+    .dc-upgrade-card {
+      width:100%; text-align:left; cursor:pointer; display:block;
+      background: rgba(18,6,6,0.92);
+      border-top: 1px solid rgba(160,30,30,0.22);
+      border-right: 1px solid rgba(160,30,30,0.22);
+      border-bottom: 1px solid rgba(160,30,30,0.22);
+      transition: background 0.12s, box-shadow 0.12s;
+      padding: 0.55rem 0.7rem;
+      font-family: inherit;
+    }
+    .dc-upgrade-card:not(:disabled):hover { background: rgba(55,14,8,0.95); box-shadow: inset 3px 0 0 rgba(192,57,43,0.4); }
+    .dc-upgrade-card:disabled { opacity: 0.38; cursor: not-allowed; }
+
+    /* Tab buttons */
+    .dc-tab { display:inline-flex; align-items:center; gap:0.35rem; padding:0.35rem 0.7rem; font-size:0.72rem; font-weight:700; font-family:inherit; cursor:pointer; border:1px solid rgba(120,25,25,0.5); background:rgba(20,6,6,0.8); color:var(--dc-muted); transition:all 0.14s; clip-path:polygon(3px 0%,100% 0%,calc(100% - 3px) 100%,0% 100%); }
+    .dc-tab:hover { border-color:rgba(192,57,43,0.7); color:var(--dc-text); background:rgba(50,10,10,0.9); }
+    .dc-tab.active { background:rgba(80,40,4,0.9); border-color:var(--dc-gold); color:var(--dc-gold); box-shadow:0 0 10px rgba(200,146,42,0.25); }
 
     /* Notification toast */
     .dc-toast { position:fixed; top:1rem; right:1rem; z-index:9999; padding:0.6rem 1rem; font-weight:700; font-size:0.8rem; border:1px solid var(--dc-border); background:rgba(15,4,4,0.95); color:var(--dc-text); box-shadow:0 0 20px rgba(192,57,43,0.4); }
+
+    /* Header title */
+    .dc-title { font-size:1.6rem; font-weight:900; letter-spacing:0.12em; text-transform:uppercase; color:var(--dc-gold); text-shadow:0 0 22px rgba(200,146,42,0.55), 0 2px 6px rgba(0,0,0,0.9); font-family:'Courier New',monospace; }
+
+    /* Section header */
+    .dc-section-title { font-size:0.85rem; font-weight:700; color:var(--dc-gold); display:flex; align-items:center; gap:0.4rem; margin-bottom:0.6rem; text-transform:uppercase; letter-spacing:0.06em; }
+    .dc-section-title::after { content:""; flex:1; height:1px; background:linear-gradient(90deg,rgba(200,146,42,0.4),transparent); }
+
+    /* Dungeon combat area */
+    .dc-combat-panel { background:rgba(12,4,4,0.95); border:1px solid rgba(160,30,30,0.6); box-shadow:0 0 20px rgba(192,57,43,0.15) inset; padding:0.75rem; }
   </style>
 </head>
 <body>
@@ -515,21 +544,21 @@ const WORLDS = {
       { id:"h13", name:"星の精霊",      desc:"宇宙の力",          icon:Star,     cost:40000,   mps:320,    cpc:0,   tier:4 },
       { id:"h14", name:"魔法王の冠",    desc:"王の証",            icon:Crown,    cost:80000,   mps:650,    cpc:0,   tier:5 },
       { id:"h15", name:"魔法の城",      desc:"魔力の要塞",        icon:Castle,   cost:160000,  mps:1300,   cpc:0,   tier:5 },
-      { id:"h16", name:"幽霊の軍団",    desc:"不死の軍勢",        icon:Ghost,    cost:400000,  mps:2600,   cpc:0,   tier:6 },
-      { id:"h17", name:"全知の眼",      desc:"すべてを見る",      icon:Eye,      cost:600000,  mps:0,      cpc:320, tier:6 },
-      { id:"h18", name:"創造の魔法",    desc:"世界を創る力",      icon:Sparkles, cost:1600000, mps:13000,  cpc:0,   tier:6 },
-      { id:"h19", name:"虚空の書庫",    desc:"禁書が眠る回廊",    icon:Book,     cost:2600000, mps:22000,  cpc:0,   tier:6 },
-      { id:"h20", name:"霊峰の賢者",    desc:"大地の叡智を束ねる",icon:Mountain, cost:4200000, mps:36000,  cpc:0,   tier:6 },
-      { id:"h21", name:"時巡りの杖",    desc:"時流を導く古杖",    icon:Wand2,    cost:6800000, mps:0,      cpc:900, tier:6 },
-      { id:"h22", name:"七曜の結界",    desc:"七つの光が守る陣",  icon:Circle,   cost:11000000,mps:62000,  cpc:0,   tier:6 },
-      { id:"h23", name:"夜空の祭壇",    desc:"星を招く祭儀台",    icon:Star,     cost:18000000,mps:100000, cpc:0,   tier:6 },
-      { id:"h24", name:"古龍の契約印",  desc:"龍脈を開く紋章",    icon:Scroll,   cost:30000000,mps:0,      cpc:1800,tier:6 },
-      { id:"h25", name:"紅蓮の王冠",    desc:"炎王の祝福",        icon:Crown,    cost:50000000,mps:180000, cpc:0,   tier:6 },
-      { id:"h26", name:"蒼天の観測眼",  desc:"天球を読む瞳",      icon:Eye,      cost:82000000,mps:0,      cpc:3200,tier:6 },
-      { id:"h27", name:"幻想城塞",      desc:"魔力を蓄える城塞",  icon:Castle,   cost:135000000,mps:320000,cpc:0,   tier:6 },
-      { id:"h28", name:"深淵の星詠み",  desc:"運命の星を編む",    icon:Moon,     cost:220000000,mps:520000,cpc:0,   tier:6 },
-      { id:"h29", name:"創律の炉心",    desc:"世界律を鍛える炉",  icon:Flame,    cost:360000000,mps:0,      cpc:5600,tier:6 },
-      { id:"h30", name:"根源の大魔法",  desc:"すべての術式の祖",  icon:Sparkles, cost:600000000,mps:900000,cpc:0,   tier:6 },
+      { id:"h16", name:"幽霊の軍団",    desc:"不死の軍勢",        icon:Ghost,    cost:260000,  mps:2600,   cpc:0,   tier:6 },
+      { id:"h17", name:"全知の眼",      desc:"すべてを見る",      icon:Eye,      cost:420000,  mps:0,      cpc:320, tier:6 },
+      { id:"h18", name:"創造の魔法",    desc:"世界を創る力",      icon:Sparkles, cost:680000,  mps:13000,  cpc:0,   tier:6 },
+      { id:"h19", name:"虚空の書庫",    desc:"禁書が眠る回廊",    icon:Book,     cost:1100000, mps:22000,  cpc:0,   tier:6 },
+      { id:"h20", name:"霊峰の賢者",    desc:"大地の叡智を束ねる",icon:Mountain, cost:1800000, mps:36000,  cpc:0,   tier:6 },
+      { id:"h21", name:"時巡りの杖",    desc:"時流を導く古杖",    icon:Wand2,    cost:2900000, mps:0,      cpc:900, tier:6 },
+      { id:"h22", name:"七曜の結界",    desc:"七つの光が守る陣",  icon:Circle,   cost:4700000, mps:62000,  cpc:0,   tier:6 },
+      { id:"h23", name:"夜空の祭壇",    desc:"星を招く祭儀台",    icon:Star,     cost:7600000, mps:100000, cpc:0,   tier:6 },
+      { id:"h24", name:"古龍の契約印",  desc:"龍脈を開く紋章",    icon:Scroll,   cost:12300000,mps:0,      cpc:1800,tier:6 },
+      { id:"h25", name:"紅蓮の王冠",    desc:"炎王の祝福",        icon:Crown,    cost:20000000,mps:180000, cpc:0,   tier:6 },
+      { id:"h26", name:"蒼天の観測眼",  desc:"天球を読む瞳",      icon:Eye,      cost:32000000,mps:0,      cpc:3200,tier:6 },
+      { id:"h27", name:"幻想城塞",      desc:"魔力を蓄える城塞",  icon:Castle,   cost:52000000,mps:320000, cpc:0,   tier:6 },
+      { id:"h28", name:"深淵の星詠み",  desc:"運命の星を編む",    icon:Moon,     cost:85000000,mps:520000, cpc:0,   tier:6 },
+      { id:"h29", name:"創律の炉心",    desc:"世界律を鍛える炉",  icon:Flame,    cost:137000000,mps:0,     cpc:5600,tier:6 },
+      { id:"h30", name:"根源の大魔法",  desc:"すべての術式の祖",  icon:Sparkles, cost:222000000,mps:900000,cpc:0,   tier:6 },
     ]},
   forest:  { id: "forest",  name: "魔法の森", emoji: "🌲", desc: "精霊たちが住む神秘の森",     bg: "from-green-900 via-emerald-900 to-teal-900",   border: "border-green-500",  currency: "精霊の露", currencyEmoji: "🌿", requiredExams: 1,
     upgrades: [
@@ -568,18 +597,18 @@ const WORLDS = {
       { id:"k8",  name:"魔法の塔",      desc:"王国の象徴",        icon:Mountain, cost:300000,  mps:600,    cpc:0,   tier:4 },
       { id:"k9",  name:"王国の守護龍",  desc:"伝説の龍",          icon:Eye,      cost:800000,  mps:2000,   cpc:0,   tier:5 },
       { id:"k10", name:"魔法皇帝",      desc:"最高の支配者",      icon:Star,     cost:2000000, mps:6000,   cpc:0,   tier:5 },
-      { id:"k11", name:"神聖魔法",      desc:"王国最強の魔法",    icon:Sparkles, cost:5000000, mps:20000,  cpc:0,   tier:6 },
-      { id:"k12", name:"王国の秘宝",    desc:"古代の宝",          icon:Atom,     cost:12000000,mps:0,      cpc:1000,tier:6 },
-      { id:"k13", name:"帝国錬金院",    desc:"王都最大の工房",    icon:Book,     cost:19000000,mps:35000,  cpc:0,   tier:6 },
-      { id:"k14", name:"竜騎兵団",      desc:"空を裂く精鋭騎兵",  icon:Users,    cost:31000000,mps:62000,  cpc:0,   tier:6 },
-      { id:"k15", name:"王家の雷槍",    desc:"雷を宿す神槍",      icon:Zap,      cost:51000000,mps:0,      cpc:1800,tier:6 },
-      { id:"k16", name:"深青の要塞",    desc:"王都を守る巨城",    icon:Castle,   cost:84000000,mps:110000, cpc:0,   tier:6 },
-      { id:"k17", name:"黄金評議会",    desc:"百賢が治める議会",  icon:Crown,    cost:138000000,mps:190000,cpc:0,   tier:6 },
-      { id:"k18", name:"皇帝の紋章剣",  desc:"帝位を示す秘剣",    icon:Flame,    cost:225000000,mps:0,     cpc:3200,tier:6 },
-      { id:"k19", name:"王国星図塔",    desc:"天体術を統べる塔",  icon:Mountain, cost:370000000,mps:340000,cpc:0,   tier:6 },
-      { id:"k20", name:"太陽王の勅令",  desc:"勅命で魔力増幅",    icon:Sun,      cost:610000000,mps:600000,cpc:0,   tier:6 },
-      { id:"k21", name:"永遠戴冠の儀",  desc:"王権を永続させる",  icon:Scroll,   cost:1000000000,mps:0,    cpc:5600,tier:6 },
-      { id:"k22", name:"王国神話継承",  desc:"神代の力を継ぐ",    icon:Atom,     cost:1650000000,mps:1000000,cpc:0,  tier:6 },
+      { id:"k11", name:"神聖魔法",      desc:"王国最強の魔法",    icon:Sparkles, cost:3200000, mps:20000,  cpc:0,   tier:6 },
+      { id:"k12", name:"王国の秘宝",    desc:"古代の宝",          icon:Atom,     cost:5200000, mps:0,      cpc:1000,tier:6 },
+      { id:"k13", name:"帝国錬金院",    desc:"王都最大の工房",    icon:Book,     cost:8400000, mps:35000,  cpc:0,   tier:6 },
+      { id:"k14", name:"竜騎兵団",      desc:"空を裂く精鋭騎兵",  icon:Users,    cost:13600000,mps:62000,  cpc:0,   tier:6 },
+      { id:"k15", name:"王家の雷槍",    desc:"雷を宿す神槍",      icon:Zap,      cost:22000000,mps:0,      cpc:1800,tier:6 },
+      { id:"k16", name:"深青の要塞",    desc:"王都を守る巨城",    icon:Castle,   cost:35600000,mps:110000, cpc:0,   tier:6 },
+      { id:"k17", name:"黄金評議会",    desc:"百賢が治める議会",  icon:Crown,    cost:57600000,mps:190000, cpc:0,   tier:6 },
+      { id:"k18", name:"皇帝の紋章剣",  desc:"帝位を示す秘剣",    icon:Flame,    cost:93200000,mps:0,      cpc:3200,tier:6 },
+      { id:"k19", name:"王国星図塔",    desc:"天体術を統べる塔",  icon:Mountain, cost:151000000,mps:340000,cpc:0,   tier:6 },
+      { id:"k20", name:"太陽王の勅令",  desc:"勅命で魔力増幅",    icon:Sun,      cost:244000000,mps:600000,cpc:0,   tier:6 },
+      { id:"k21", name:"永遠戴冠の儀",  desc:"王権を永続させる",  icon:Scroll,   cost:395000000,mps:0,     cpc:5600,tier:6 },
+      { id:"k22", name:"王国神話継承",  desc:"神代の力を継ぐ",    icon:Atom,     cost:640000000,mps:1000000,cpc:0,  tier:6 },
     ]},
   heaven:  { id: "heaven",  name: "天上界",   emoji: "☁️", desc: "天使たちが舞う神聖な場所", bg: "from-sky-900 via-blue-800 to-indigo-900",      border: "border-sky-400",    currency: "天の光",   currencyEmoji: "💫", requiredExams: 3,
     upgrades: [
@@ -593,18 +622,18 @@ const WORLDS = {
       { id:"v8",  name:"天界の書",      desc:"神の言葉が記された書",icon:Scroll, cost:1500000, mps:6000,   cpc:0,   tier:4 },
       { id:"v9",  name:"光の精霊王",    desc:"光を統べる王",      icon:Crown,    cost:4000000, mps:20000,  cpc:0,   tier:5 },
       { id:"v10", name:"天の奇跡",      desc:"奇跡を起こす力",    icon:Sparkles, cost:10000000,mps:60000,  cpc:0,   tier:5 },
-      { id:"v11", name:"神の加護",      desc:"神からの祝福",      icon:Eye,      cost:25000000,mps:0,      cpc:5000,tier:6 },
-      { id:"v12", name:"天界の頂点",    desc:"天上界の極み",      icon:Atom,     cost:60000000,mps:200000, cpc:0,   tier:6 },
-      { id:"v13", name:"蒼穹の回廊",    desc:"雲上を巡る光路",    icon:Wind,     cost:98000000,mps:340000, cpc:0,   tier:6 },
-      { id:"v14", name:"聖歌の鐘楼",    desc:"祈りが響く鐘楼",    icon:Users,    cost:160000000,mps:580000,cpc:0,   tier:6 },
-      { id:"v15", name:"天啓の写本",    desc:"神託を書き写す",    icon:Scroll,   cost:265000000,mps:0,     cpc:9000,tier:6 },
-      { id:"v16", name:"白翼の軍勢",    desc:"光翼の守護軍",      icon:Star,     cost:440000000,mps:1000000,cpc:0,   tier:6 },
-      { id:"v17", name:"光冠の聖座",    desc:"天位を示す玉座",    icon:Crown,    cost:720000000,mps:1700000,cpc:0,  tier:6 },
-      { id:"v18", name:"黎明の神杖",    desc:"夜明けを呼ぶ杖",    icon:Wand2,    cost:1180000000,mps:0,    cpc:15000,tier:6 },
-      { id:"v19", name:"天河の祭壇",    desc:"星河を集める祭壇",  icon:Moon,     cost:1950000000,mps:2900000,cpc:0,  tier:6 },
-      { id:"v20", name:"永光の聖域",    desc:"光が尽きぬ聖地",    icon:Sun,      cost:3200000000,mps:5000000,cpc:0,  tier:6 },
-      { id:"v21", name:"神言の審判書",  desc:"真理を裁く聖典",    icon:Book,     cost:5300000000,mps:0,    cpc:24000,tier:6 },
-      { id:"v22", name:"天界創世譚",    desc:"天の始まりを綴る",  icon:Sparkles, cost:8700000000,mps:8500000,cpc:0, tier:6 },
+      { id:"v11", name:"神の加護",      desc:"神からの祝福",      icon:Eye,      cost:16000000,mps:0,      cpc:5000,tier:6 },
+      { id:"v12", name:"天界の頂点",    desc:"天上界の極み",      icon:Atom,     cost:26000000,mps:200000, cpc:0,   tier:6 },
+      { id:"v13", name:"蒼穹の回廊",    desc:"雲上を巡る光路",    icon:Wind,     cost:42000000,mps:340000, cpc:0,   tier:6 },
+      { id:"v14", name:"聖歌の鐘楼",    desc:"祈りが響く鐘楼",    icon:Users,    cost:68000000,mps:580000, cpc:0,   tier:6 },
+      { id:"v15", name:"天啓の写本",    desc:"神託を書き写す",    icon:Scroll,   cost:110000000,mps:0,     cpc:9000,tier:6 },
+      { id:"v16", name:"白翼の軍勢",    desc:"光翼の守護軍",      icon:Star,     cost:178000000,mps:1000000,cpc:0,  tier:6 },
+      { id:"v17", name:"光冠の聖座",    desc:"天位を示す玉座",    icon:Crown,    cost:288000000,mps:1700000,cpc:0,  tier:6 },
+      { id:"v18", name:"黎明の神杖",    desc:"夜明けを呼ぶ杖",    icon:Wand2,    cost:465000000,mps:0,     cpc:15000,tier:6 },
+      { id:"v19", name:"天河の祭壇",    desc:"星河を集める祭壇",  icon:Moon,     cost:752000000,mps:2900000,cpc:0,  tier:6 },
+      { id:"v20", name:"永光の聖域",    desc:"光が尽きぬ聖地",    icon:Sun,      cost:1217000000,mps:5000000,cpc:0, tier:6 },
+      { id:"v21", name:"神言の審判書",  desc:"真理を裁く聖典",    icon:Book,     cost:1970000000,mps:0,    cpc:24000,tier:6 },
+      { id:"v22", name:"天界創世譚",    desc:"天の始まりを綴る",  icon:Sparkles, cost:3190000000,mps:8500000,cpc:0, tier:6 },
     ]},
   divine:  { id: "divine",  name: "神界",     emoji: "⚡", desc: "神々が住まう究極の世界",   bg: "from-yellow-900 via-orange-900 to-red-900",    border: "border-yellow-400", currency: "神力",     currencyEmoji: "⚡", requiredExams: 4,
     upgrades: [
@@ -618,18 +647,18 @@ const WORLDS = {
       { id:"d8",  name:"全知の神",      desc:"すべてを知る神",    icon:Eye,      cost:15000000,mps:0,      cpc:8000,tier:4 },
       { id:"d9",  name:"創世の力",      desc:"世界を創る力",      icon:Crown,    cost:40000000,mps:120000, cpc:0,   tier:5 },
       { id:"d10", name:"神の言葉",      desc:"現実を書き換える",  icon:Scroll,   cost:100000000,mps:400000,cpc:0,   tier:5 },
-      { id:"d11", name:"無限の神力",    desc:"尽きぬ神の力",      icon:Sparkles, cost:300000000,mps:0,     cpc:50000,tier:6 },
-      { id:"d12", name:"宇宙の創造神",  desc:"すべての頂点",      icon:Star,     cost:1000000000,mps:2000000,cpc:0,  tier:6 },
-      { id:"d13", name:"原初の雷冠",    desc:"天地開闢の雷",      icon:Zap,      cost:1700000000,mps:3500000,cpc:0,   tier:6 },
-      { id:"d14", name:"虚無の律法書",  desc:"存在を記す法典",    icon:Book,     cost:2800000000,mps:0,    cpc:70000,tier:6 },
-      { id:"d15", name:"神核の祭儀",    desc:"神力を束ねる儀式",  icon:Circle,   cost:4600000000,mps:6200000,cpc:0,  tier:6 },
-      { id:"d16", name:"終焉の審判眼",  desc:"滅びを見通す瞳",    icon:Eye,      cost:7600000000,mps:0,    cpc:95000,tier:6 },
-      { id:"d17", name:"創世の王座",    desc:"神々を統べる座",    icon:Crown,    cost:12500000000,mps:11000000,cpc:0,tier:6 },
-      { id:"d18", name:"次元縫合炉",    desc:"次元を接ぐ炉",      icon:Flame,    cost:20500000000,mps:19000000,cpc:0,tier:6 },
-      { id:"d19", name:"星海の門",      desc:"宇宙潮流へ通じる",  icon:Moon,     cost:33800000000,mps:0,    cpc:140000,tier:6 },
-      { id:"d20", name:"神界大審議",    desc:"万象を決する会議",  icon:Users,    cost:55700000000,mps:33000000,cpc:0,tier:6 },
-      { id:"d21", name:"根源観測機関",  desc:"根源情報を解析",    icon:Atom,     cost:92000000000,mps:0,    cpc:210000,tier:6 },
-      { id:"d22", name:"無限回帰の神話",desc:"世界を巡らせる詩",  icon:Sparkles, cost:152000000000,mps:56000000,cpc:0,tier:6 },
+      { id:"d11", name:"無限の神力",    desc:"尽きぬ神の力",      icon:Sparkles, cost:160000000,mps:0,     cpc:50000,tier:6 },
+      { id:"d12", name:"宇宙の創造神",  desc:"すべての頂点",      icon:Star,     cost:260000000,mps:2000000,cpc:0,  tier:6 },
+      { id:"d13", name:"原初の雷冠",    desc:"天地開闢の雷",      icon:Zap,      cost:420000000,mps:3500000,cpc:0,   tier:6 },
+      { id:"d14", name:"虚無の律法書",  desc:"存在を記す法典",    icon:Book,     cost:679000000,mps:0,     cpc:70000,tier:6 },
+      { id:"d15", name:"神核の祭儀",    desc:"神力を束ねる儀式",  icon:Circle,   cost:1099000000,mps:6200000,cpc:0,  tier:6 },
+      { id:"d16", name:"終焉の審判眼",  desc:"滅びを見通す瞳",    icon:Eye,      cost:1780000000,mps:0,    cpc:95000,tier:6 },
+      { id:"d17", name:"創世の王座",    desc:"神々を統べる座",    icon:Crown,    cost:2880000000,mps:11000000,cpc:0,tier:6 },
+      { id:"d18", name:"次元縫合炉",    desc:"次元を接ぐ炉",      icon:Flame,    cost:4660000000,mps:19000000,cpc:0,tier:6 },
+      { id:"d19", name:"星海の門",      desc:"宇宙潮流へ通じる",  icon:Moon,     cost:7548000000,mps:0,    cpc:140000,tier:6 },
+      { id:"d20", name:"神界大審議",    desc:"万象を決する会議",  icon:Users,    cost:12207000000,mps:33000000,cpc:0,tier:6 },
+      { id:"d21", name:"根源観測機関",  desc:"根源情報を解析",    icon:Atom,     cost:19777000000,mps:0,   cpc:210000,tier:6 },
+      { id:"d22", name:"無限回帰の神話",desc:"世界を巡らせる詩",  icon:Sparkles, cost:32000000000,mps:56000000,cpc:0,tier:6 },
     ]},
   abyss:   { id: "abyss",   name: "冥界",     emoji: "🕳️", desc: "死霊と影が渦巻く深淵の領域", bg: "from-slate-900 via-zinc-900 to-gray-900",      border: "border-slate-500",  currency: "冥力",     currencyEmoji: "🕯️", requiredExams: 5,
     upgrades: [
@@ -2308,91 +2337,102 @@ function MagicClicker() {
       <div className="max-w-6xl mx-auto p-4">
 
         {/* ヘッダー */}
-        <div className="relative text-center mb-3 mt-3">
+        <div className="relative text-center mb-3 mt-2">
           <button onClick={()=>setActiveTab("profile")}
-            className={`absolute left-0 top-0 flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-bold transition-all ${activeTab==="profile"?"bg-yellow-500 text-black":"bg-black bg-opacity-30 hover:bg-opacity-50 text-purple-200"}`}>
-            <PixelIcon src={UI_PIXEL_ICONS.wizard} alt="profile" className="w-4 h-4" />
-            <span className="hidden sm:inline">{playerName}</span>
+            className="absolute left-0 top-0 dc-btn flex items-center gap-1.5 px-2 py-1.5 text-xs"
+            style={activeTab==="profile"?{borderColor:"var(--dc-gold)",color:"var(--dc-gold)"}:{}}>
+            <span style={{fontSize:"1.1em"}}>🧙</span>
+            <span className="hidden sm:inline" style={{color:"var(--dc-gold)", maxWidth:"120px", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap"}}>{playerName}</span>
           </button>
-          <h1 className="world-headline text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-200 to-pink-200">魔法使いの修行</h1>
-          <p className="text-xs mt-1 opacity-50">{saveMsg}</p>
+          <div className="dc-title">⚗ MAGIC CLICKER</div>
+          <p className="text-xs mt-0.5" style={{color:"var(--dc-muted)", fontSize:"0.65rem"}}>{saveMsg}</p>
           <div className="mt-2 flex items-center justify-center gap-2">
-            <button
-              onClick={quickSubmitRanking}
-              disabled={onlineBusy}
-              className={`px-3 py-1.5 rounded-md text-xs font-bold border-2 shadow-[0_0_0_2px_rgba(0,0,0,0.35)] transition-all ${onlineBusy ? "bg-slate-700 text-slate-300 border-slate-500 cursor-not-allowed" : "bg-amber-400 hover:bg-amber-300 text-black border-amber-100"}`}
-            >
-              {onlineBusy ? "送信中..." : "オンラインに送信"}
+            <button onClick={quickSubmitRanking} disabled={onlineBusy}
+              className="dc-btn dc-btn-gold px-3 py-1 text-xs"
+              style={onlineBusy?{opacity:0.5,cursor:"not-allowed"}:{}}>
+              {onlineBusy ? "送信中…" : "🏆 ランキング送信"}
             </button>
-            <button
-              onClick={()=>setActiveTab("scoreboard")}
-              className="px-3 py-1.5 rounded-lg text-xs font-bold bg-black bg-opacity-30 hover:bg-opacity-50"
-            >
-              スコアボードへ
+            <button onClick={()=>setActiveTab("scoreboard")} className="dc-btn px-3 py-1 text-xs">
+              スコアボード
             </button>
           </div>
         </div>
 
         {/* タブ */}
-        <div className="flex flex-wrap gap-2 mb-3 justify-center">
+        <div className="flex flex-wrap gap-1.5 mb-3 justify-center">
           {[
-            {id:"game", icon:TAB_ICON_URLS.game, label:`${world.name}の儀式`},
-            {id:"worlds", icon:TAB_ICON_URLS.worlds, label:"世界巡歴"},
-            {id:"dungeon", icon:TAB_ICON_URLS.dungeon, label:"ダンジョン"},
-            {id:"quests", icon:TAB_ICON_URLS.quests, label:"クエスト"},
-            {id:"exams", icon:TAB_ICON_URLS.exams, label:"魔法試練"},
-            {id:"equipment", icon:TAB_ICON_URLS.equipment, label:"装備"},
-            {id:"crafting", icon:TAB_ICON_URLS.crafting, label:"錬金工房"},
-            {id:"inventory", icon:TAB_ICON_URLS.inventory, label:"秘蔵品"},
+            {id:"game",       icon:TAB_ICON_URLS.game,       label:`${world.name}の儀式`},
+            {id:"worlds",     icon:TAB_ICON_URLS.worlds,     label:"世界巡歴"},
+            {id:"dungeon",    icon:TAB_ICON_URLS.dungeon,    label:"ダンジョン"},
+            {id:"quests",     icon:TAB_ICON_URLS.quests,     label:"クエスト"},
+            {id:"exams",      icon:TAB_ICON_URLS.exams,      label:"魔法試練"},
+            {id:"equipment",  icon:TAB_ICON_URLS.equipment,  label:"装備"},
+            {id:"crafting",   icon:TAB_ICON_URLS.crafting,   label:"錬金工房"},
+            {id:"inventory",  icon:TAB_ICON_URLS.inventory,  label:"秘蔵品"},
             {id:"scoreboard", icon:TAB_ICON_URLS.scoreboard, label:"スコアボード"},
           ].map(tab=>(
             <button key={tab.id} onClick={()=>setActiveTab(tab.id)}
-              className={`px-3 py-1.5 rounded-lg font-bold text-xs transition-all flex items-center gap-1.5 ${activeTab===tab.id?"bg-yellow-400 text-black shadow-lg scale-105":"bg-white bg-opacity-10 hover:bg-opacity-20 text-white"}`}
-              style={activeTab===tab.id?{boxShadow:"0 0 12px rgba(250,204,21,0.5)"}:{}}>
-              <span style={{fontSize:"1.1em"}}>{tab.icon}</span>
+              className={`dc-tab${activeTab===tab.id?" active":""}`}>
+              <span style={{fontSize:"1.05em"}}>{tab.icon}</span>
               <span>{tab.label}</span>
             </button>
           ))}
         </div>
 
         {/* ステータスバー */}
-        <div className="world-panel rounded-lg p-3 mb-3 border">
-          <div className="grid grid-cols-3 md:grid-cols-6 gap-2 text-center text-xs">
-            <div><div className="font-bold text-yellow-300 text-sm">{fmt(mana)}</div><div className="opacity-70 flex justify-center"><PixelIcon src={getWorldIcon(currentWorld)} alt="currency" className="w-4 h-4" /></div></div>
-            <div><div className="font-bold text-blue-300">{fmt(clicks)}回</div><div className="opacity-70 flex items-center justify-center gap-1"><PixelIcon src={UI_PIXEL_ICONS.click} alt="click" className="w-3.5 h-3.5" /><span>クリック数</span></div></div>
-            <div><div className="font-bold text-green-300">{fmt(mps)}/秒</div><div className="opacity-70">生産</div></div>
-            <div><div className="font-bold text-cyan-300">{fmt(crystals)}</div><div className="opacity-70 flex justify-center"><PixelIcon src={UI_PIXEL_ICONS.crystal} alt="crystal" className="w-4 h-4" /></div></div>
-            <div><div className="font-bold text-purple-300">{fmt(souls)}</div><div className="opacity-70 flex justify-center"><PixelIcon src={UI_PIXEL_ICONS.soul} alt="soul" className="w-4 h-4" /></div></div>
-            <div><div className="font-bold text-orange-300">{prestige}回/{prestigePts}pt</div><div className="opacity-70">転生</div></div>
+        <div className="mb-3" style={{background:"rgba(12,4,4,0.92)", borderLeft:"3px solid var(--dc-red)", borderTop:"1px solid rgba(160,30,30,0.3)", borderRight:"1px solid rgba(160,30,30,0.3)", borderBottom:"1px solid rgba(160,30,30,0.3)", padding:"0.6rem 0.75rem"}}>
+          <div className="grid grid-cols-3 md:grid-cols-6 gap-2 text-center">
+            <div>
+              <div className="font-bold text-sm" style={{color:"var(--dc-gold)"}}>{fmt(mana)}</div>
+              <div className="flex justify-center mt-0.5"><PixelIcon src={getWorldIcon(currentWorld)} alt="currency" className="w-4 h-4" /></div>
+            </div>
+            <div>
+              <div className="font-bold text-sm" style={{color:"#60a5fa"}}>{fmt(clicks)}回</div>
+              <div className="flex items-center justify-center gap-1 text-xs" style={{color:"var(--dc-muted)"}}>
+                <PixelIcon src={UI_PIXEL_ICONS.click} alt="click" className="w-3 h-3" /><span>クリック</span>
+              </div>
+            </div>
+            <div>
+              <div className="font-bold text-sm" style={{color:"#4ade80"}}>{fmt(mps)}/s</div>
+              <div className="text-xs" style={{color:"var(--dc-muted)"}}>生産</div>
+            </div>
+            <div>
+              <div className="font-bold text-sm" style={{color:"#22d3ee"}}>{fmt(crystals)}</div>
+              <div className="flex justify-center mt-0.5"><PixelIcon src={UI_PIXEL_ICONS.crystal} alt="crystal" className="w-4 h-4" /></div>
+            </div>
+            <div>
+              <div className="font-bold text-sm" style={{color:"#c084fc"}}>{fmt(souls)}</div>
+              <div className="flex justify-center mt-0.5"><PixelIcon src={UI_PIXEL_ICONS.soul} alt="soul" className="w-4 h-4" /></div>
+            </div>
+            <div>
+              <div className="font-bold text-sm" style={{color:"#fb923c"}}>{prestige}回</div>
+              <div className="text-xs" style={{color:"var(--dc-muted)"}}>転生/{prestigePts}pt</div>
+            </div>
           </div>
-          <div className="text-xs text-center text-cyan-300 mt-1">
-            世界解放ボーナス: {unlockedWorldIds.length}世界（総合倍率 ×{unlockedWorldCountBonus.toFixed(2)}）
-          </div>
-          {passedExams.length>0 && <div className="text-xs text-center text-green-300 mt-1">検定ボーナス +{(examBonus*100).toFixed(0)}% ／ 総倍率 ×{totalBonus.toFixed(1)}</div>}
-          <div className="text-xs text-center text-pink-300 mt-1">
-            装備ボーナス: マナ×{equipmentMultipliers.mana.toFixed(2)} / クリック×{equipmentMultipliers.click.toFixed(2)} / 結晶×{equipmentMultipliers.crystal.toFixed(2)} / 魂×{equipmentMultipliers.soul.toFixed(2)}
+          <div className="mt-1.5 pt-1.5 flex flex-wrap gap-x-3 gap-y-0.5 text-xs justify-center" style={{borderTop:"1px solid rgba(120,20,20,0.35)"}}>
+            <span style={{color:"#22d3ee"}}>🌍 {unlockedWorldIds.length}世界 ×{unlockedWorldCountBonus.toFixed(2)}</span>
+            {passedExams.length>0 && <span style={{color:"#4ade80"}}>📚 検定×{totalBonus.toFixed(1)}</span>}
+            <span style={{color:"#f472b6"}}>🛡️ Mana×{equipmentMultipliers.mana.toFixed(2)} Click×{equipmentMultipliers.click.toFixed(2)}</span>
           </div>
         </div>
 
         {/* クラフト結果通知 */}
         {craftResult && (
-          <div className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-lg font-bold shadow-2xl whitespace-pre-line ${craftResult.success?"bg-green-600 text-white":"bg-red-600 text-white"}`}>
+          <div className="dc-toast" style={{top:"4rem",right:"1rem",borderColor:craftResult.success?"rgba(74,222,128,0.5)":"var(--dc-border)",color:craftResult.success?"#4ade80":"var(--dc-text)"}}>
             {craftResult.msg}
           </div>
         )}
         <div className="fixed bottom-4 left-4 z-40">
-          <button
-            onClick={quickSubmitRanking}
-            disabled={onlineBusy}
-            className={`px-4 py-2 rounded-md text-sm font-bold border-2 transition-all shadow-[0_0_0_2px_rgba(0,0,0,0.35)] ${onlineBusy ? "bg-slate-700 text-slate-300 border-slate-500 cursor-not-allowed" : "bg-amber-400 hover:bg-amber-300 text-black border-amber-100"}`}
-          >
-            {onlineBusy ? "送信中..." : "オンラインに送信"}
+          <button onClick={quickSubmitRanking} disabled={onlineBusy}
+            className="dc-btn dc-btn-gold px-4 py-2 text-sm"
+            style={onlineBusy?{opacity:0.5,cursor:"not-allowed"}:{}}>
+            {onlineBusy ? "送信中…" : "🏆 ランキング送信"}
           </button>
         </div>
         {remainingEffect.length>0 && (
           <div className="fixed right-4 bottom-4 z-40 space-y-1 max-w-xs">
             {remainingEffect.map(e=>(
-              <div key={e.id} className="text-xs bg-black bg-opacity-75 border border-yellow-500 rounded px-2 py-1">
+              <div key={e.id} className="text-xs px-2 py-1" style={{background:"rgba(10,5,15,0.92)", border:"1px solid rgba(123,45,139,0.6)", color:"var(--dc-text)"}}>
                 <span className="flex items-center gap-2"><PixelIcon src={e.iconUrl || getPotionIcon(e.potionId)} alt={e.name} className="w-4 h-4" />{e.name} あと{Math.ceil(e.remaining/60)}分</span>
               </div>
             ))}
@@ -2511,28 +2551,28 @@ function MagicClicker() {
             </div>
 
             {/* ショップ */}
-            <div className={`world-panel rounded-lg p-4 border ${world.border}`}>
-              <h2 className="text-base font-bold mb-3 text-yellow-300 flex items-center gap-2"><PixelIcon src={getWorldIcon(world.id)} alt={world.name} className="w-5 h-5" />{world.name}のショップ</h2>
-              <div className="text-xs text-cyan-300 mb-2">基準価格倍率 ×{(WORLD_SHOP_BASE_MULTIPLIERS[currentWorld]||1).toFixed(2)}</div>
-              <div className="space-y-2 max-h-96 overflow-y-auto pr-1">
+            <div className="world-panel rounded-lg p-4 border" style={{borderColor:"rgba(200,146,42,0.35)"}}>
+              <div className="dc-section-title"><PixelIcon src={getWorldIcon(world.id)} alt={world.name} className="w-4 h-4" />{world.name}のショップ</div>
+              <div className="text-xs mb-2" style={{color:"var(--dc-muted)"}}>基準価格倍率 ×{(WORLD_SHOP_BASE_MULTIPLIERS[currentWorld]||1).toFixed(2)}</div>
+              <div className="space-y-1 max-h-96 overflow-y-auto pr-1">
                 {worldUpgrades.map(u=>{
                   const Icon=u.icon;
                   const canBuy=mana>=u.cost;
-                  const color=canBuy?TIER_COLORS[u.tier]:"from-gray-800 to-gray-900 border-gray-700";
                   return (
                     <button key={u.id} onClick={()=>buyUpgrade(u, u.cost)} disabled={!canBuy}
-                      className={`w-full p-2.5 rounded-lg bg-gradient-to-r ${color} border-2 transition-all ${canBuy?"cursor-pointer hover:brightness-110":"opacity-50 cursor-not-allowed"}`}>
+                      className={`dc-upgrade-card dc-tier-${u.tier}`}>
                       <div className="flex items-center gap-2">
-                        <div className="bg-black bg-opacity-30 p-1.5 rounded"><Icon className="w-5 h-5 text-yellow-300"/></div>
-                        <div className="flex-1 text-left">
-                          <div className="font-bold text-xs">{u.name}</div>
-                          <div className="text-xs opacity-60">{u.desc}</div>
-                          <div className="flex gap-2">
-                            <span className="text-xs text-purple-200">{u.owned}個</span>
-                            <span className="text-xs text-green-300">{u.mps>0?`+${fmt(u.mps * upgradeBenefitMultiplier)}/秒`:`クリック+${fmt(u.cpc * upgradeBenefitMultiplier)}`}</span>
+                        <div className="p-1 rounded flex-shrink-0" style={{background:"rgba(0,0,0,0.45)"}}>
+                          <Icon className="w-4 h-4" style={{color:canBuy?"var(--dc-gold)":"var(--dc-muted)"}}/>
+                        </div>
+                        <div className="flex-1 text-left min-w-0">
+                          <div className="font-bold text-xs truncate" style={{color:canBuy?"var(--dc-text)":"var(--dc-muted)"}}>{u.name}</div>
+                          <div className="flex gap-2 mt-0.5 flex-wrap">
+                            <span className="text-xs" style={{color:"#c084fc"}}>{u.owned}個</span>
+                            <span className="text-xs" style={{color:"#4ade80"}}>{u.mps>0?`+${fmt(u.mps * upgradeBenefitMultiplier)}/s`:`⚔+${fmt(u.cpc * upgradeBenefitMultiplier)}`}</span>
                           </div>
                         </div>
-                        <div className="text-yellow-300 font-bold text-xs">{fmt(u.cost)}</div>
+                        <div className="font-bold text-xs flex-shrink-0" style={{color:"var(--dc-gold)"}}>{fmt(u.cost)}</div>
                       </div>
                     </button>
                   );
@@ -2550,23 +2590,33 @@ function MagicClicker() {
               const isActive=currentWorld===w.id;
               return (
                 <button key={w.id} onClick={()=>{if(unlocked){setCurrentWorld(w.id);setActiveTab("game");}}} disabled={!unlocked}
-                  className={`p-4 rounded-lg border-2 text-left transition-all ${unlocked?`bg-gradient-to-br ${w.bg} ${w.border} hover:brightness-110 cursor-pointer`:"bg-gray-900 border-gray-700 opacity-50 cursor-not-allowed"} ${isActive?"ring-4 ring-yellow-400":""}`}>
-                  <div className="flex items-center gap-3 mb-2">
-                    <PixelIcon src={getWorldIcon(w.id)} alt={w.name} className="w-8 h-8" />
+                  className="p-3 text-left transition-all"
+                  style={{
+                    background: isActive ? "rgba(60,30,5,0.9)" : unlocked ? "rgba(18,6,6,0.88)" : "rgba(8,4,4,0.7)",
+                    border: isActive ? `2px solid var(--dc-gold)` : unlocked ? "1px solid rgba(160,30,30,0.5)" : "1px solid rgba(60,50,50,0.3)",
+                    opacity: unlocked ? 1 : 0.45,
+                    cursor: unlocked ? "pointer" : "not-allowed",
+                    boxShadow: isActive ? "0 0 12px rgba(200,146,42,0.25)" : "none",
+                    borderRadius: "2px",
+                  }}>
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <span className="text-2xl">{w.emoji}</span>
                     <div>
-                      <div className="font-bold">{w.name}{isActive&&<span className="text-yellow-300 text-xs ml-2">（現在地）</span>}</div>
-                      <div className="text-xs opacity-70">{w.desc}</div>
+                      <div className="font-bold text-sm" style={{color:isActive?"var(--dc-gold)":"var(--dc-text)"}}>
+                        {w.name}{isActive&&<span className="text-xs ml-2" style={{color:"var(--dc-gold)"}}>◀ 現在地</span>}
+                      </div>
+                      <div className="text-xs" style={{color:"var(--dc-muted)"}}>{w.desc}</div>
                     </div>
                   </div>
                   <div className="text-xs">
                     {unlocked?(
                       <>
-                        <span className="text-green-300 flex items-center gap-1"><PixelIcon src={UI_PIXEL_ICONS.check} alt="open" className="w-3.5 h-3.5" />解放済み</span>
-                        <span className="ml-2 opacity-60 flex items-center gap-1"><PixelIcon src={getWorldIcon(w.id)} alt="currency" className="w-3.5 h-3.5" />{fmt(mana)}</span>
-                        <div className="mt-1 text-cyan-300">{WORLD_UNLOCK_PERKS[w.id]?.desc || "解放ボーナスあり"}</div>
+                        <span style={{color:"#4ade80"}}>✅ 解放済み ／ </span>
+                        <span style={{color:"var(--dc-muted)"}}>{fmt(mana)} {w.currencyEmoji}</span>
+                        <div className="mt-1" style={{color:"#22d3ee"}}>{WORLD_UNLOCK_PERKS[w.id]?.desc || ""}</div>
                       </>
                     ):(
-                      <span className="text-red-300 flex items-center gap-1"><PixelIcon src={UI_PIXEL_ICONS.lock} alt="lock" className="w-3.5 h-3.5" />検定{w.requiredExams}回合格で解放</span>
+                      <span style={{color:"var(--dc-red)"}}>🔒 検定{w.requiredExams}回合格で解放</span>
                     )}
                   </div>
                 </button>
@@ -2577,79 +2627,106 @@ function MagicClicker() {
 
         {/* ダンジョンタブ */}
         {activeTab==="dungeon" && (
-          <div className="space-y-4">
-            <div className="world-panel rounded-lg p-4 border border-red-500">
-              <h3 className="font-bold text-red-300 mb-2 flex items-center gap-2"><PixelIcon src={UI_PIXEL_ICONS.dungeon} alt="dungeon" className="w-4 h-4" />{WORLDS[currentWorld].name}ダンジョン</h3>
+          <div className="space-y-3">
+            <div className="dc-combat-panel rounded-lg">
+              <div className="dc-section-title">
+                <PixelIcon src={UI_PIXEL_ICONS.dungeon} alt="dungeon" className="w-4 h-4" />
+                {WORLDS[currentWorld].name}ダンジョン
+              </div>
               {!dungeonRun ? (
-                <div>
-                  <p className="text-sm opacity-80 mb-2">ウェーブ制。倒れた場合もその挑戦で獲得した物資は保持されます。</p>
-                  <div className="text-xs text-cyan-300 mb-3">最高到達: Wave {dungeonProgress[currentWorld]?.bestWave || 0} / 挑戦回数: {dungeonProgress[currentWorld]?.runs || 0}</div>
-                  <button onClick={()=>startDungeonRun(currentWorld)} className="px-4 py-2 bg-red-500 hover:bg-red-400 rounded font-bold text-black">挑戦開始</button>
+                <div className="space-y-2">
+                  <p className="text-xs" style={{color:"var(--dc-muted)"}}>ウェーブ制。倒れた場合もその挑戦で獲得した物資は保持されます。</p>
+                  <div className="text-xs" style={{color:"#22d3ee"}}>
+                    最高到達: <strong>Wave {dungeonProgress[currentWorld]?.bestWave || 0}</strong> ／ 挑戦: {dungeonProgress[currentWorld]?.runs || 0}回
+                  </div>
+                  <button onClick={()=>startDungeonRun(currentWorld)} className="dc-btn dc-btn-gold px-5 py-2 font-bold text-sm mt-1">
+                    ▶ 挑戦開始
+                  </button>
                 </div>
               ) : (
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="font-bold">Wave {dungeonRun.wave}{dungeonRun.wave%10===0?" 👑ボス":""}</span>
-                    <button onClick={()=>finishDungeonRun("retreat")} className="px-2 py-1 bg-gray-700 rounded text-xs">撤退</button>
+                <div className="space-y-2">
+                  {/* Wave info + retreat */}
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-sm" style={{color:dungeonRun.wave%10===0?"var(--dc-gold)":"var(--dc-text)"}}>
+                      {dungeonRun.wave%10===0 ? "👑 " : ""}WAVE {dungeonRun.wave}
+                      {dungeonRun.wave%10===0 && <span className="text-xs ml-1" style={{color:"var(--dc-gold)"}}>BOSS</span>}
+                    </span>
+                    <button onClick={()=>finishDungeonRun("retreat")} className="dc-btn px-2 py-1 text-xs">撤退</button>
                   </div>
+
                   {/* プレイヤーHP */}
-                  <div className="text-xs text-green-300">🧙 HP {fmt(dungeonRun.hp)} / {fmt(dungeonRun.maxHp)}</div>
-                  <div className="w-full h-2 bg-gray-800 rounded"><div className="h-2 bg-green-400 rounded transition-all" style={{width:`${Math.max(0,Math.min(100,dungeonRun.hp/dungeonRun.maxHp*100))}%`}} /></div>
-                  <div className="text-xs text-purple-300">攻撃力: {fmt(dungeonAttack)} / 結界: {dungeonRun.barrierHits>0?`${Math.floor((dungeonRun.barrier||0)*100)}%軽減(${dungeonRun.barrierHits}回)`:"なし"}</div>
+                  <div className="space-y-1">
+                    <div className="flex justify-between text-xs">
+                      <span style={{color:"#4ade80"}}>🧙 HP {fmt(dungeonRun.hp)} / {fmt(dungeonRun.maxHp)}</span>
+                      <span style={{color:"#c084fc"}}>⚔ {fmt(dungeonAttack)}{dungeonRun.barrierHits>0?` 🛡${Math.floor((dungeonRun.barrier||0)*100)}%(${dungeonRun.barrierHits}回)`:""}</span>
+                    </div>
+                    <div className="dc-hp-track" style={{height:"8px"}}>
+                      <div className="dc-hp-fill" style={{width:`${Math.max(0,Math.min(100,dungeonRun.hp/dungeonRun.maxHp*100))}%`, background:"linear-gradient(90deg,#1a6b1a,#4ade80)"}} />
+                    </div>
+                  </div>
+
                   {/* 敵カード一覧 */}
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap gap-2 mt-1">
                     {(dungeonRun.enemies||[]).map(e => (
-                      <div key={e.id} className={`flex-1 min-w-0 rounded-lg border p-2 text-center transition-all ${e.hp<=0?"border-gray-700 opacity-30 bg-black bg-opacity-20":"border-red-500 bg-black bg-opacity-40"}`}>
-                        <div className="text-3xl">{e.emoji}</div>
-                        <div className="text-xs font-bold truncate mt-1">{e.name}</div>
-                        <div className="text-xs opacity-75">HP {fmt(e.hp)}</div>
-                        <div className="w-full h-1.5 bg-gray-800 rounded mt-1">
-                          <div className="h-1.5 bg-red-400 rounded transition-all" style={{width:`${Math.max(0,Math.min(100,e.hp/e.maxHp*100))}%`}} />
-                        </div>
-                        <div className="text-xs text-orange-300 mt-1">攻 {fmt(e.atk)}</div>
+                      <div key={e.id} className={`flex-1 min-w-0 p-2 text-center transition-all ${e.hp<=0 ? "dc-enemy-dead" : "dc-enemy-alive"}`} style={{borderRadius:"2px"}}>
+                        <div className="text-4xl leading-tight">{e.hp<=0 ? "💀" : e.emoji}</div>
+                        <div className="text-xs font-bold truncate mt-1" style={{color:e.hp<=0?"var(--dc-muted)":"var(--dc-text)"}}>{e.name}</div>
+                        {e.hp > 0 && (
+                          <>
+                            <div className="text-xs mt-0.5" style={{color:"#fca5a5"}}>HP {fmt(e.hp)}</div>
+                            <div className="dc-hp-track mt-1">
+                              <div className="dc-hp-fill" style={{width:`${Math.max(0,Math.min(100,e.hp/e.maxHp*100))}%`}} />
+                            </div>
+                            <div className="text-xs mt-1" style={{color:"#fb923c"}}>攻 {fmt(e.atk)}</div>
+                          </>
+                        )}
                       </div>
                     ))}
                   </div>
-                  <button onClick={attackDungeonEnemy} className="w-full px-4 py-2 bg-yellow-500 hover:bg-yellow-400 rounded font-bold text-black">⚔️ 攻撃する</button>
-                  {/* 魔法パネル（戦闘中のみ表示） */}
-                  <div className="mt-3 border-t border-purple-800 pt-3">
-                    <div className="text-xs text-purple-300 mb-2">🔮 魔法スキル</div>
+
+                  {/* 攻撃ボタン */}
+                  <button onClick={attackDungeonEnemy} className="w-full py-2.5 dc-btn dc-btn-gold font-bold text-sm" style={{clipPath:"none"}}>
+                    ⚔️ 攻撃する
+                  </button>
+
+                  {/* 魔法パネル */}
+                  <div className="pt-2" style={{borderTop:"1px solid rgba(123,45,139,0.4)"}}>
+                    <div className="text-xs mb-2" style={{color:"#c084fc"}}>🔮 魔法スキル</div>
                     <div className="grid grid-cols-2 gap-2">
                       {SPELLS.map(sp => {
                         const remain = spellCooldowns[sp.id] || 0;
                         const unlocked = bestWaveAll >= (sp.unlockWave || 1);
                         const ready = unlocked && remain === 0;
                         const cdPct = remain > 0 ? Math.round((remain / sp.cooldown) * 100) : 0;
-                        const targetColor = sp.target==="all"?"text-red-300 border-red-700":sp.target==="self"?"text-green-300 border-green-700":"text-blue-300 border-blue-700";
-                        const targetLabel = sp.target === "all" ? "全体" : sp.target === "self" ? "回復" : "単体";
+                        const tgtColor = sp.target==="all"?"#fca5a5":sp.target==="self"?"#86efac":"#93c5fd";
+                        const tgtLabel = sp.target==="all"?"全体":sp.target==="self"?"回復":"単体";
                         return (
-                          <div key={sp.id} className={`rounded-lg border p-2 transition-all relative overflow-hidden ${!unlocked?"border-gray-700 bg-black bg-opacity-20 opacity-50":ready?"border-purple-400 bg-purple-900 bg-opacity-30":"border-gray-600 bg-black bg-opacity-30"}`}>
-                            {/* クールダウンバー（発動済み時） */}
+                          <div key={sp.id}
+                            className={!unlocked?"dc-spell-locked":ready?"dc-spell-ready":"dc-spell-cd"}
+                            style={{padding:"0.45rem 0.55rem", borderRadius:"2px", position:"relative", overflow:"hidden"}}>
+                            {/* CDオーバーレイ */}
                             {unlocked && remain > 0 && (
-                              <div className="absolute inset-0 pointer-events-none">
-                                <div className="h-full bg-gray-700 bg-opacity-60 transition-all"
-                                  style={{width:`${cdPct}%`}} />
-                              </div>
+                              <div style={{position:"absolute",top:0,left:0,bottom:0,width:`${cdPct}%`,background:"rgba(0,0,0,0.55)",pointerEvents:"none"}} />
                             )}
-                            <div className="relative z-10">
+                            <div style={{position:"relative",zIndex:1}}>
                               <div className="flex items-center justify-between mb-1">
-                                <span className={`text-xs font-bold ${ready?"text-purple-200":"text-gray-400"}`}>{sp.name}</span>
-                                <span className={`text-xs border px-1 rounded ${targetColor}`}>{targetLabel}</span>
+                                <span className="text-xs font-bold" style={{color:ready?"#d8b4fe":"var(--dc-muted)"}}>{sp.name}</span>
+                                <span className="text-xs px-1" style={{color:tgtColor, border:`1px solid ${tgtColor}44`, borderRadius:"2px"}}>{tgtLabel}</span>
                               </div>
-                              <div className="text-xs opacity-55 mb-1 leading-tight">{sp.desc.replace(/【.+】/,"")}</div>
+                              <div className="text-xs mb-1 leading-tight" style={{color:"var(--dc-muted)",opacity:0.85}}>{sp.desc.replace(/【.+】/,"")}</div>
                               {!unlocked ? (
-                                <div className="text-xs text-yellow-400 font-bold">🔒 Wave{sp.unlockWave}で解放</div>
+                                <div className="text-xs font-bold" style={{color:"var(--dc-gold)"}}>🔒 Wave{sp.unlockWave}</div>
                               ) : remain > 0 ? (
                                 <div className="flex items-center gap-1">
-                                  <div className="flex-1 h-1.5 bg-gray-700 rounded overflow-hidden">
-                                    <div className="h-full bg-purple-500 transition-all" style={{width:`${100 - cdPct}%`}} />
+                                  <div className="flex-1 overflow-hidden" style={{height:"4px",background:"rgba(60,20,60,0.8)"}}>
+                                    <div style={{height:"100%",width:`${100-cdPct}%`,background:"#7b2d8b",transition:"width 0.2s"}} />
                                   </div>
-                                  <span className="text-xs text-gray-400 font-bold">{remain}T</span>
+                                  <span className="text-xs font-bold" style={{color:"#c084fc"}}>{remain}T</span>
                                 </div>
                               ) : (
                                 <button onClick={()=>castSpell(sp.id)}
-                                  className="w-full py-1 rounded text-xs font-bold bg-purple-500 hover:bg-purple-400 text-black"
-                                  style={{boxShadow:"0 0 8px rgba(168,85,247,0.5)"}}>
+                                  className="w-full py-1 font-bold text-xs"
+                                  style={{background:"rgba(100,20,120,0.7)",border:"1px solid rgba(123,45,139,0.8)",color:"#e9d5ff",cursor:"pointer",boxShadow:"0 0 8px rgba(123,45,139,0.4)"}}>
                                   ✨ 発動
                                 </button>
                               )}
@@ -2662,10 +2739,12 @@ function MagicClicker() {
                 </div>
               )}
             </div>
-            <div className="world-panel rounded-lg p-4 border border-amber-500">
-              <div className="text-xs text-amber-300">10ウェーブごとに宝箱獲得（高レアほど低確率）</div>
-              <div className="text-xs opacity-80 mt-1">
-                Common {(DUNGEON_WAVE_BOX_RATES.common*100).toFixed(1)}% / Uncommon {(DUNGEON_WAVE_BOX_RATES.uncommon*100).toFixed(1)}% / Rare {(DUNGEON_WAVE_BOX_RATES.rare*100).toFixed(1)}% / Epic {(DUNGEON_WAVE_BOX_RATES.epic*100).toFixed(1)}% / Legendary {(DUNGEON_WAVE_BOX_RATES.legendary*100).toFixed(1)}%
+
+            {/* ドロップ情報 */}
+            <div className="world-panel rounded p-3 border" style={{borderColor:"rgba(200,146,42,0.3)"}}>
+              <div className="text-xs font-bold mb-1" style={{color:"var(--dc-gold)"}}>🎁 10ウェーブごとに宝箱</div>
+              <div className="text-xs" style={{color:"var(--dc-muted)"}}>
+                Common {(DUNGEON_WAVE_BOX_RATES.common*100).toFixed(0)}% ／ Uncommon {(DUNGEON_WAVE_BOX_RATES.uncommon*100).toFixed(0)}% ／ Rare {(DUNGEON_WAVE_BOX_RATES.rare*100).toFixed(0)}% ／ Epic {(DUNGEON_WAVE_BOX_RATES.epic*100).toFixed(1)}% ／ Legendary {(DUNGEON_WAVE_BOX_RATES.legendary*100).toFixed(1)}%
               </div>
             </div>
           </div>
