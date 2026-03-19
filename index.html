@@ -2502,48 +2502,44 @@ function MagicClicker() {
 
               <div className="mt-4 w-full max-w-xs space-y-2">
                 {/* 転生必要条件 */}
-                <div className="bg-black bg-opacity-30 rounded-lg p-2 text-xs space-y-1">
-                  <div className="text-yellow-300 font-bold text-center mb-1">転生条件（{nextPrestige}回目）</div>
-                  <div className={`flex justify-between ${mana>=requiredMana?"text-green-300":"text-red-300"}`}>
-                    <span className="flex items-center gap-1"><PixelIcon src={getWorldIcon(currentWorld)} alt="mana" className="w-4 h-4" />マナ</span><span>{fmt(mana)} / {fmt(requiredMana)}</span>
+                <div className="p-2 text-xs space-y-1.5" style={{background:"rgba(8,3,3,0.9)", border:"1px solid rgba(200,146,42,0.35)", borderLeft:"3px solid var(--dc-gold)"}}>
+                  <div className="font-bold text-center mb-1" style={{color:"var(--dc-gold)"}}>🔄 転生条件（{nextPrestige}回目）</div>
+                  <div className="flex justify-between" style={{color:mana>=requiredMana?"#4ade80":"#fca5a5"}}>
+                    <span className="flex items-center gap-1"><PixelIcon src={getWorldIcon(currentWorld)} alt="mana" className="w-3.5 h-3.5" />マナ</span><span>{fmt(mana)} / {fmt(requiredMana)}</span>
                   </div>
                   {requiredCrystals>0 && (
-                    <div className={`flex justify-between ${crystals>=requiredCrystals?"text-green-300":"text-red-300"}`}>
-                      <span className="flex items-center gap-1"><PixelIcon src={UI_PIXEL_ICONS.crystal} alt="crystal" className="w-4 h-4" />クリスタル</span><span>{fmt(crystals)} / {fmt(requiredCrystals)}</span>
+                    <div className="flex justify-between" style={{color:crystals>=requiredCrystals?"#4ade80":"#fca5a5"}}>
+                      <span className="flex items-center gap-1">💎 クリスタル</span><span>{fmt(crystals)} / {fmt(requiredCrystals)}</span>
                     </div>
                   )}
                   {requiredSouls>0 && (
-                    <div className={`flex justify-between ${souls>=requiredSouls?"text-green-300":"text-red-300"}`}>
-                      <span className="flex items-center gap-1"><PixelIcon src={UI_PIXEL_ICONS.soul} alt="soul" className="w-4 h-4" />魂</span><span>{fmt(souls)} / {fmt(requiredSouls)}</span>
+                    <div className="flex justify-between" style={{color:souls>=requiredSouls?"#4ade80":"#fca5a5"}}>
+                      <span className="flex items-center gap-1">💜 魂</span><span>{fmt(souls)} / {fmt(requiredSouls)}</span>
                     </div>
                   )}
                   {prestige>0 && (
-                    <div className="text-purple-300 text-center mt-1">現在のマナ倍率: ×{prestigeManaBonus.toFixed(1)}</div>
+                    <div className="text-center mt-1" style={{color:"#c084fc"}}>現在のマナ倍率: ×{prestigeManaBonus.toFixed(1)}</div>
                   )}
                 </div>
                 {canPrestige ? (
                   prestigeConfirm ? (
-                    <div className="space-y-1">
-                      <div className="text-center text-xs text-yellow-300 bg-black bg-opacity-40 rounded p-2">本当に転生しますか？<br/>獲得: +{prestigeGain}pt　次の倍率: ×{((prestige+1)*0.2+1.1).toFixed(1)}</div>
+                    <div className="space-y-1.5">
+                      <div className="text-center text-xs p-2" style={{background:"rgba(0,0,0,0.5)", border:"1px solid rgba(200,146,42,0.4)", color:"var(--dc-gold)"}}>
+                        本当に転生しますか？<br/>
+                        <span style={{color:"#fb923c"}}>+{prestigeGain}pt ／ 次の倍率: ×{((prestige+1)*0.2+1.1).toFixed(1)}</span>
+                      </div>
                       <div className="flex gap-2">
-                        <button onClick={doPrestige}
-                          className="flex-1 py-2 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-lg text-black font-bold text-sm hover:brightness-110 transition-all">
-                          はい
-                        </button>
-                        <button onClick={()=>setPrestigeConfirm(false)}
-                          className="flex-1 py-2 bg-gray-700 rounded-lg text-white font-bold text-sm hover:bg-gray-600 transition-all">
-                          いいえ
-                        </button>
+                        <button onClick={doPrestige} className="flex-1 py-1.5 dc-btn dc-btn-gold font-bold text-sm">はい</button>
+                        <button onClick={()=>setPrestigeConfirm(false)} className="flex-1 py-1.5 dc-btn font-bold text-sm">いいえ</button>
                       </div>
                     </div>
                   ) : (
-                    <button onClick={doPrestige}
-                      className="w-full py-2 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-lg text-black font-bold text-sm hover:brightness-110 transition-all">
-                      転生する（+{prestigeGain}pt）
+                    <button onClick={doPrestige} className="w-full py-2 dc-btn dc-btn-gold font-bold text-sm" style={{clipPath:"none"}}>
+                      🔄 転生する（+{prestigeGain}pt）
                     </button>
                   )
                 ) : (
-                  <div className="text-center text-xs opacity-50 bg-black bg-opacity-20 rounded p-1">
+                  <div className="text-center text-xs p-1.5" style={{color:"var(--dc-muted)", background:"rgba(0,0,0,0.25)", border:"1px solid rgba(80,30,30,0.3)"}}>
                     条件を満たすと転生できます
                   </div>
                 )}
@@ -2752,23 +2748,29 @@ function MagicClicker() {
 
         {/* クエストタブ */}
         {activeTab==="quests" && (
-          <div className="space-y-3">
+          <div className="space-y-2">
             {QUESTS.map(q => {
               const done = q.check(questStats);
               const claimed = claimedQuestSet.has(q.id);
               return (
-                <div key={q.id} className={`rounded-lg border p-3 ${claimed?"border-green-500 bg-green-900 bg-opacity-25":"border-cyan-500 bg-black bg-opacity-35"}`}>
-                  <div className="font-bold">{q.name}</div>
-                  <div className="text-xs opacity-75">{q.desc}</div>
-                  <div className="text-xs mt-1 text-yellow-300">
-                    報酬: {q.reward.crystals?`結晶${fmt(q.reward.crystals)} `:""}{q.reward.souls?`魂${fmt(q.reward.souls)} `:""}{q.reward.box?`${POTION_BOXES[q.reward.box]?.name || q.reward.box}×${q.reward.count || 1}`:""}
+                <div key={q.id} className="p-3" style={{
+                  background: claimed ? "rgba(10,30,10,0.85)" : done ? "rgba(10,20,30,0.85)" : "rgba(12,6,6,0.88)",
+                  border: claimed ? "1px solid rgba(74,222,128,0.4)" : done ? "1px solid rgba(34,211,238,0.5)" : "1px solid rgba(120,30,30,0.4)",
+                  borderLeft: claimed ? "3px solid #4ade80" : done ? "3px solid #22d3ee" : "3px solid rgba(120,30,30,0.6)",
+                  borderRadius: "2px",
+                }}>
+                  <div className="font-bold text-sm" style={{color:claimed?"#4ade80":done?"#22d3ee":"var(--dc-text)"}}>{q.name}</div>
+                  <div className="text-xs mt-0.5" style={{color:"var(--dc-muted)"}}>{q.desc}</div>
+                  <div className="text-xs mt-1" style={{color:"var(--dc-gold)"}}>
+                    🎁 {q.reward.crystals?`💎${fmt(q.reward.crystals)} `:""}{q.reward.souls?`💜${fmt(q.reward.souls)} `:""}{q.reward.box?`${POTION_BOXES[q.reward.box]?.name}×${q.reward.count||1}`:""}
                   </div>
                   {claimed ? (
-                    <div className="text-xs text-green-300 mt-2">受取済み</div>
+                    <div className="text-xs mt-1.5" style={{color:"#4ade80"}}>✅ 受取済み</div>
                   ) : (
                     <button onClick={()=>claimQuest(q.id)} disabled={!done}
-                      className={`mt-2 px-3 py-1.5 rounded text-sm font-bold ${done?"bg-cyan-400 hover:bg-cyan-300 text-black":"bg-gray-700 text-gray-400 cursor-not-allowed"}`}>
-                      報酬を受け取る
+                      className={`mt-2 px-3 py-1 text-sm font-bold dc-btn ${done?"dc-btn-gold":""}`}
+                      style={!done?{opacity:0.4,cursor:"not-allowed"}:{}}>
+                      受け取る
                     </button>
                   )}
                 </div>
@@ -2779,38 +2781,51 @@ function MagicClicker() {
 
         {/* 検定タブ */}
         {activeTab==="exams" && (
-          <div className="space-y-3">
-            <p className="text-center text-xs opacity-60">検定は「指定世界のダンジョン到達Wave」で合格できます。</p>
+          <div className="space-y-2">
+            <p className="text-center text-xs mb-3" style={{color:"var(--dc-muted)"}}>検定は「指定世界のダンジョン到達Wave」で合格できます。</p>
             {EXAMS.map(exam=>{
               const passed=passedExams.includes(exam.id);
               const best = Number(dungeonProgress[exam.requiredWorld]?.bestWave || 0);
               const canTake = best >= exam.requiredWave && !passed;
+              const progress = Math.min(100, (best / exam.requiredWave) * 100);
               return (
-                <div key={exam.id} className={`p-4 rounded-lg border-2 ${passed?"bg-green-900 border-green-400":canTake?"bg-yellow-900 border-yellow-400":"bg-gray-900 border-gray-700 opacity-70"}`}>
+                <div key={exam.id} className="p-3" style={{
+                  background: passed ? "rgba(10,25,10,0.9)" : canTake ? "rgba(20,18,5,0.9)" : "rgba(12,6,6,0.88)",
+                  border: passed ? "1px solid rgba(74,222,128,0.5)" : canTake ? "1px solid rgba(200,146,42,0.6)" : "1px solid rgba(80,30,30,0.4)",
+                  borderLeft: passed ? "3px solid #4ade80" : canTake ? "3px solid var(--dc-gold)" : "3px solid rgba(100,30,30,0.5)",
+                  borderRadius: "2px",
+                  opacity: (!passed && !canTake && best === 0) ? 0.65 : 1,
+                }}>
                   <div className="flex items-center justify-between flex-wrap gap-2">
-                    <div className="flex items-center gap-3">
-                      <PixelIcon src={getExamIcon(exam.id)} alt={exam.name} className="w-7 h-7" />
+                    <div className="flex items-center gap-2">
+                      <span style={{fontSize:"1.5rem"}}>{getExamIcon(exam.id)}</span>
                       <div>
-                        <div className="font-bold">{exam.name}</div>
-                        <div className="text-xs text-green-300">ボーナス: {exam.bonus}</div>
-                        <div className="text-xs mt-1 space-x-2 flex flex-wrap gap-1">
-                          <span className="text-cyan-300">{WORLDS[exam.requiredWorld]?.name} ダンジョン</span>
-                          <span className={best>=exam.requiredWave?"text-green-300":"text-red-300"}>到達Wave {best} / {exam.requiredWave}</span>
-                        </div>
-                        <div className="text-xs mt-1 opacity-70">
-                          合格報酬: {POTION_BOXES[exam.reward.box]?.name}×{exam.reward.count}
+                        <div className="font-bold text-sm" style={{color:passed?"#4ade80":canTake?"var(--dc-gold)":"var(--dc-text)"}}>{exam.name}</div>
+                        <div className="text-xs" style={{color:"#4ade80"}}>{exam.bonus}</div>
+                        <div className="text-xs mt-0.5 flex gap-2">
+                          <span style={{color:"#22d3ee"}}>{WORLDS[exam.requiredWorld]?.name}</span>
+                          <span style={{color:best>=exam.requiredWave?"#4ade80":"#fca5a5"}}>Wave {best}/{exam.requiredWave}</span>
                         </div>
                       </div>
                     </div>
                     {passed?(
-                      <span className="text-green-300 font-bold text-sm flex items-center gap-1"><PixelIcon src={UI_PIXEL_ICONS.check} alt="clear" className="w-3.5 h-3.5" />合格済み</span>
+                      <span className="font-bold text-sm" style={{color:"#4ade80"}}>✅ 合格済み</span>
                     ):(
                       <button onClick={()=>startExam(exam)} disabled={!canTake}
-                        className={`px-4 py-2 rounded-lg font-bold text-sm ${canTake?"bg-yellow-500 hover:bg-yellow-400 text-black":"bg-gray-700 text-gray-400 cursor-not-allowed"}`}>
+                        className={`px-3 py-1.5 text-sm font-bold dc-btn ${canTake?"dc-btn-gold":""}`}
+                        style={!canTake?{opacity:0.4,cursor:"not-allowed"}:{}}>
                         受験する
                       </button>
                     )}
                   </div>
+                  {!passed && (
+                    <div className="mt-2">
+                      <div className="dc-hp-track" style={{height:"4px"}}>
+                        <div style={{height:"100%",width:`${progress}%`,background:progress>=100?"#4ade80":"linear-gradient(90deg,#1565c0,#22d3ee)",transition:"width 0.3s"}} />
+                      </div>
+                    </div>
+                  )}
+                  <div className="text-xs mt-1" style={{color:"var(--dc-muted)"}}>報酬: {POTION_BOXES[exam.reward.box]?.name}×{exam.reward.count}</div>
                 </div>
               );
             })}
@@ -2819,33 +2834,30 @@ function MagicClicker() {
 
         {/* 装備タブ */}
         {activeTab==="equipment" && (
-          <div className="space-y-4">
-            <div className="bg-black bg-opacity-30 rounded-lg p-4 border border-pink-500">
-              <h3 className="font-bold text-pink-300 mb-2 flex items-center gap-2">
-                <PixelIcon src={UI_PIXEL_ICONS.equipment} alt="equipment" className="w-4 h-4" />
-                装備中
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+          <div className="space-y-3">
+            {/* 装備中スロット */}
+            <div className="p-3" style={{background:"rgba(12,5,12,0.9)", border:"1px solid rgba(160,30,160,0.4)", borderLeft:"3px solid #7b2d8b"}}>
+              <div className="dc-section-title" style={{color:"#c084fc"}}>🛡️ 装備スロット</div>
+              <div className="grid grid-cols-2 gap-2 text-sm">
                 {EQUIPMENT_SLOTS.map(slot => {
                   const equippedId = equippedSlots[slot.id];
                   const eq = EQUIPMENTS.find(e => e.id === equippedId);
                   return (
-                    <div key={slot.id} className="bg-black bg-opacity-40 border border-pink-400 border-opacity-40 rounded p-2 flex items-center justify-between gap-2">
+                    <div key={slot.id} className="flex items-center justify-between gap-1 p-2" style={{background:"rgba(0,0,0,0.4)", border:"1px solid rgba(123,45,139,0.35)"}}>
                       <div>
-                        <div className="text-pink-200 text-xs">{slot.name}</div>
-                        <div className="font-bold">{eq ? eq.name : "未装備"}</div>
+                        <div className="text-xs" style={{color:"#c084fc"}}>{slot.name}</div>
+                        <div className="font-bold text-xs" style={{color:eq?"#e9d5ff":"var(--dc-muted)"}}>{eq ? eq.name : "未装備"}</div>
                       </div>
                       {eq && (
-                        <button onClick={() => unequipSlot(slot.id)} className="px-2 py-1 text-xs rounded bg-gray-700 hover:bg-gray-600">
-                          外す
-                        </button>
+                        <button onClick={() => unequipSlot(slot.id)} className="dc-btn px-2 py-0.5 text-xs">外す</button>
                       )}
                     </div>
                   );
                 })}
               </div>
             </div>
-            <div className="space-y-3">
+            {/* 装備リスト */}
+            <div className="space-y-2">
               {EQUIPMENTS.map(eq => {
                 const owned = !!equipmentOwned[eq.id];
                 const equipped = equippedSlots[eq.slot] === eq.id;
@@ -2856,49 +2868,50 @@ function MagicClicker() {
                 const lackMat = Object.entries(need.materials || {}).some(([matId, amt]) => (materials[matId] || 0) < amt);
                 const canBuy = !owned && unlocked && !lackCrystals && !lackSouls && !lackMat;
                 return (
-                  <div key={eq.id} className={`rounded-lg border p-3 ${equipped ? "border-pink-300 bg-pink-900 bg-opacity-25" : "border-pink-700 bg-black bg-opacity-35"}`}>
+                  <div key={eq.id} className="p-3" style={{
+                    background: equipped ? "rgba(20,8,25,0.95)" : "rgba(12,5,5,0.9)",
+                    border: equipped ? "1px solid rgba(123,45,139,0.8)" : "1px solid rgba(120,30,30,0.35)",
+                    borderLeft: equipped ? "3px solid #c084fc" : owned ? "3px solid var(--dc-gold)" : "3px solid rgba(120,30,30,0.5)",
+                    borderRadius: "2px",
+                    opacity: !unlocked ? 0.5 : 1,
+                  }}>
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex items-center gap-2">
-                        <PixelIcon src={getEquipmentIcon(eq.id)} alt={eq.name} className="w-6 h-6" />
                         <div>
-                          <div className="font-bold">{eq.name}</div>
-                          <div className="text-xs opacity-80">{eq.desc}</div>
-                          <div className="text-xs text-cyan-300 mt-1">解放条件: 検定{eq.requiredExams}回</div>
+                          <div className="font-bold text-sm" style={{color:equipped?"#c084fc":owned?"var(--dc-gold)":"var(--dc-text)"}}>{eq.name}</div>
+                          <div className="text-xs" style={{color:"var(--dc-muted)"}}>{eq.desc}</div>
+                          <div className="text-xs mt-0.5" style={{color:"#22d3ee"}}>検定{eq.requiredExams}回必要</div>
                         </div>
                       </div>
-                      <div className="text-xs text-right">
+                      <div className="text-xs font-bold flex-shrink-0">
                         {owned ? (
-                          <span className={equipped ? "text-green-300 font-bold" : "text-yellow-300 font-bold"}>{equipped ? "装備中" : "入手済み"}</span>
+                          <span style={{color:equipped?"#c084fc":"var(--dc-gold)"}}>{equipped ? "装備中" : "入手済み"}</span>
                         ) : (
-                          <span className={canBuy ? "text-green-300" : "text-red-300"}>{canBuy ? "購入可能" : "未購入"}</span>
+                          <span style={{color:canBuy?"#4ade80":"#fca5a5"}}>{canBuy ? "購入可" : "未購入"}</span>
                         )}
                       </div>
                     </div>
-                    <div className="mt-2 text-xs opacity-90">
-                      コスト:
-                      <span className={`ml-2 ${lackCrystals ? "text-red-300" : "text-cyan-300"}`}>結晶 {fmt(need.crystals || 0)}</span>
-                      <span className={`ml-2 ${lackSouls ? "text-red-300" : "text-purple-300"}`}>魂 {fmt(need.souls || 0)}</span>
+                    <div className="mt-1.5 text-xs flex flex-wrap gap-2">
+                      <span style={{color:lackCrystals?"#fca5a5":"#22d3ee"}}>💎{fmt(need.crystals||0)}</span>
+                      <span style={{color:lackSouls?"#fca5a5":"#c084fc"}}>💜{fmt(need.souls||0)}</span>
+                      {Object.entries(need.materials||{}).map(([matId,amt])=>(
+                        <span key={matId} style={{color:(materials[matId]||0)>=amt?"#4ade80":"#fca5a5"}}>
+                          {MATERIALS[matId]?.emoji}{MATERIALS[matId]?.name||matId} {materials[matId]||0}/{amt}
+                        </span>
+                      ))}
                     </div>
-                    {Object.keys(need.materials || {}).length > 0 && (
-                      <div className="mt-1 text-xs opacity-90">
-                        素材:
-                        {Object.entries(need.materials || {}).map(([matId, amt]) => (
-                          <span key={matId} className={`ml-2 ${(materials[matId] || 0) >= amt ? "text-green-300" : "text-red-300"}`}>
-                            {MATERIALS[matId]?.name || matId} {materials[matId] || 0}/{amt}
-                          </span>
-                        ))}
-                      </div>
-                    )}
                     <div className="mt-2">
                       {!owned ? (
                         <button onClick={() => buyEquipment(eq)} disabled={!canBuy}
-                          className={`px-3 py-1.5 rounded text-sm font-bold ${canBuy ? "bg-pink-500 hover:bg-pink-400 text-black" : "bg-gray-700 text-gray-400 cursor-not-allowed"}`}>
+                          className={`px-3 py-1 text-sm font-bold dc-btn ${canBuy?"dc-btn-gold":""}`}
+                          style={!canBuy?{opacity:0.4,cursor:"not-allowed"}:{}}>
                           購入
                         </button>
                       ) : (
                         <button onClick={() => equipEquipment(eq)} disabled={equipped}
-                          className={`px-3 py-1.5 rounded text-sm font-bold ${equipped ? "bg-gray-700 text-gray-400 cursor-not-allowed" : "bg-yellow-500 hover:bg-yellow-400 text-black"}`}>
-                          装備する
+                          className="px-3 py-1 text-sm font-bold dc-btn"
+                          style={{borderColor:"rgba(123,45,139,0.7)", ...(equipped?{opacity:0.5,cursor:"not-allowed"}:{color:"#e9d5ff"})}}>
+                          {equipped ? "装備中" : "装備する"}
                         </button>
                       )}
                     </div>
@@ -2924,53 +2937,65 @@ function MagicClicker() {
         {/* 錬成タブ */}
         {activeTab==="crafting" && (
           <div className="space-y-4">
-            <div className="bg-black bg-opacity-30 rounded-lg p-4 border border-purple-500">
-              <h3 className="font-bold text-yellow-300 mb-3 flex items-center gap-2"><PixelIcon src={UI_PIXEL_ICONS.potion} alt="materials" className="w-4 h-4" />所持素材</h3>
-              <div className="grid grid-cols-3 md:grid-cols-5 gap-2">
+            {/* 所持素材 */}
+            <div className="p-3" style={{background:"rgba(10,4,15,0.9)", border:"1px solid rgba(123,45,139,0.45)", borderLeft:"3px solid #7b2d8b"}}>
+              <div className="dc-section-title" style={{color:"#c084fc"}}>⚗️ 所持素材</div>
+              <div className="grid grid-cols-3 md:grid-cols-5 gap-1.5">
                 {Object.values(MATERIALS).map(mat=>{
                   const count=materials[mat.id]||0;
+                  const isCurrent=mat.world===currentWorld;
                   return (
-                    <div key={mat.id} className={`bg-black bg-opacity-40 rounded-lg p-2 text-center border ${mat.world===currentWorld?"border-yellow-500":"border-gray-700"}`}>
-                      <div className="text-2xl flex justify-center"><PixelIcon src={getMaterialIcon(mat.id)} alt={mat.name} className="w-6 h-6" /></div>
-                      <div className="text-xs font-bold">{mat.name}</div>
-                      <div className={`text-sm font-bold ${count>0?"text-yellow-300":"text-gray-500"}`}>{count}</div>
-                      {mat.world===currentWorld&&<div className="text-xs text-green-400">現世界</div>}
+                    <div key={mat.id} className="p-1.5 text-center" style={{
+                      background:"rgba(0,0,0,0.4)", border:`1px solid ${isCurrent?"rgba(200,146,42,0.6)":"rgba(60,30,60,0.5)"}`,
+                      borderRadius:"2px", opacity: count>0?1:0.5,
+                    }}>
+                      <div className="text-xl">{mat.emoji}</div>
+                      <div className="text-xs truncate" style={{color:"var(--dc-muted)",fontSize:"0.6rem"}}>{mat.name}</div>
+                      <div className="font-bold text-sm" style={{color:count>0?"var(--dc-gold)":"var(--dc-muted)"}}>{count}</div>
+                      {isCurrent&&<div className="text-xs" style={{color:"#4ade80",fontSize:"0.55rem"}}>▲現世界</div>}
                     </div>
                   );
                 })}
               </div>
             </div>
 
-            <h3 className="font-bold text-yellow-300 flex items-center gap-2"><PixelIcon src={UI_PIXEL_ICONS.potion} alt="craft" className="w-4 h-4" />ポーション錬成</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {/* ポーション錬成 */}
+            <div className="dc-section-title">⚗️ ポーション錬成</div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
               {Object.values(POTIONS).map(potion=>{
                 const canCraft=Object.entries(potion.recipe).every(([matId,amt])=>(materials[matId]||0)>=amt);
+                const rarityColorMap = {common:"#9ca3af",uncommon:"#93c5fd",rare:"#c084fc",epic:"#fb923c",legendary:"#fbbf24"};
+                const rc = rarityColorMap[potion.rarity]||"#9ca3af";
                 return (
-                  <div key={potion.id} className={`p-3 rounded-lg border-2 bg-black bg-opacity-30 ${canCraft?"border-yellow-400":"border-gray-700"}`}>
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-2">
-                        <PixelIcon src={getPotionIcon(potion.id)} alt={potion.name} className="w-6 h-6" />
-                        <div>
-                          <div className={`font-bold text-sm ${RARITY_COLORS[potion.rarity]}`}>{potion.name}</div>
-                          <div className="text-xs opacity-60">{potion.desc}</div>
-                          <div className={`text-xs ${RARITY_COLORS[potion.rarity]}`}>{RARITY_LABELS[potion.rarity]}</div>
-                        </div>
+                  <div key={potion.id} className="p-2.5" style={{
+                    background:"rgba(12,5,5,0.9)", borderRadius:"2px",
+                    border:`1px solid ${canCraft?"rgba(200,146,42,0.5)":"rgba(60,30,30,0.4)"}`,
+                    borderLeft:`3px solid ${canCraft?"var(--dc-gold)":"rgba(60,30,30,0.6)"}`,
+                  }}>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <div>
+                        <div className="font-bold text-sm" style={{color:rc}}>{potion.emoji} {potion.name}</div>
+                        <div className="text-xs" style={{color:"var(--dc-muted)"}}>{potion.desc}</div>
                       </div>
-                      <div className="text-xs text-purple-200">所持: {potionInventory[potion.id]||0}</div>
+                      <div className="text-xs font-bold" style={{color:"#c084fc"}}>×{potionInventory[potion.id]||0}</div>
                     </div>
-                    <div className="flex flex-wrap gap-1 mb-2">
+                    <div className="flex flex-wrap gap-1 mb-1.5">
                       {Object.entries(potion.recipe).map(([matId,amt])=>{
                         const mat=MATERIALS[matId];
                         const have=materials[matId]||0;
                         return (
-                          <span key={matId} className={`text-xs px-1.5 py-0.5 rounded ${have>=amt?"bg-green-900 text-green-300":"bg-red-900 text-red-300"}`}>
-                            {mat?.name}×{amt}({have})
+                          <span key={matId} className="text-xs px-1 py-0.5" style={{
+                            background:have>=amt?"rgba(5,30,5,0.8)":"rgba(40,5,5,0.8)",
+                            color:have>=amt?"#4ade80":"#fca5a5", border:`1px solid ${have>=amt?"rgba(74,222,128,0.3)":"rgba(248,113,113,0.3)"}`,
+                          }}>
+                            {mat?.emoji}{mat?.name}×{amt}({have})
                           </span>
                         );
                       })}
                     </div>
                     <button onClick={()=>craftPotion(potion)} disabled={!canCraft}
-                      className={`w-full py-1.5 rounded text-sm font-bold ${canCraft?"bg-yellow-500 hover:bg-yellow-400 text-black":"bg-gray-700 text-gray-500 cursor-not-allowed"}`}>
+                      className={`w-full py-1 text-sm font-bold dc-btn ${canCraft?"dc-btn-gold":""}`}
+                      style={!canCraft?{opacity:0.4,cursor:"not-allowed"}:{}}>
                       錬成する
                     </button>
                   </div>
