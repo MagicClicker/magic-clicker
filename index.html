@@ -3077,8 +3077,8 @@ function MagicClicker() {
         {activeTab==="profile" && (
           <div className="max-w-md mx-auto space-y-4">
             {/* プレイヤー名 */}
-            <div className="bg-black bg-opacity-40 rounded-xl p-6 border border-purple-500 text-center">
-              <div className="mb-3 flex justify-center"><PixelIcon src={UI_PIXEL_ICONS.wizard} alt="wizard" className="w-10 h-10" /></div>
+            <div className="p-5 text-center" style={{background:"rgba(12,6,18,0.95)", border:"1px solid rgba(123,45,139,0.6)", borderTop:"3px solid var(--dc-purple)", boxShadow:"0 0 18px rgba(123,45,139,0.12) inset"}}>
+              <div className="mb-3 text-3xl">🧙</div>
               {editingName ? (
                 <div>
                   <div className="flex gap-2 justify-center">
@@ -3089,42 +3089,36 @@ function MagicClicker() {
                     onKeyDown={e=>{if(e.key==="Enter"&&nameInput.trim()){trySetPlayerName(nameInput, { closeEditor: true });}}}
                     maxLength={16}
                     placeholder="名前を入力..."
-                    className="bg-black bg-opacity-50 border-2 border-purple-400 rounded-lg px-3 py-2 text-white text-center focus:outline-none focus:border-yellow-400 w-40"
+                    style={{background:"rgba(0,0,0,0.7)", border:"1px solid rgba(123,45,139,0.8)", color:"var(--dc-text)", padding:"0.4rem 0.75rem", fontSize:"0.9rem", fontFamily:"inherit", width:"10rem", textAlign:"center", outline:"none"}}
                     autoFocus
                   />
                   <button onClick={()=>{if(nameInput.trim()){trySetPlayerName(nameInput, { closeEditor: true });}}}
-                    className="px-3 py-2 bg-yellow-500 hover:bg-yellow-400 rounded-lg text-black font-bold text-sm">保存</button>
+                    className="dc-btn dc-btn-gold px-3 py-1.5 text-sm font-bold">保存</button>
                   <button onClick={()=>{setEditingName(false); setNameError("");}}
-                    className="px-3 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-white font-bold text-sm">閉じる</button>
+                    className="dc-btn px-3 py-1.5 text-sm font-bold">閉じる</button>
                 </div>
-                  {nameError && <p className="text-red-300 text-xs mt-2">{nameError}</p>}
+                  {nameError && <p className="text-xs mt-2" style={{color:"var(--dc-red)"}}>{nameError}</p>}
                 </div>
               ) : (
                 <div>
-                  <div className="text-2xl font-bold text-yellow-300 mb-1">{playerName}</div>
+                  <div className="mb-1" style={{fontSize:"1.6rem", fontWeight:900, letterSpacing:"0.08em", color:"var(--dc-gold)", fontFamily:"'Courier New',monospace", textShadow:"0 0 14px rgba(200,146,42,0.4)"}}>{playerName}</div>
                   <button onClick={()=>{setNameInput(playerName); setNameError(""); setEditingName(true);}}
-                    className="text-xs text-purple-300 hover:text-white underline">名前を変更</button>
+                    className="dc-btn px-3 py-1 text-xs" style={{borderColor:"rgba(123,45,139,0.7)", color:"#c084fc"}}>✏️ 名前を変更</button>
                 </div>
               )}
             </div>
 
             {/* 記録 */}
-            <div className="bg-black bg-opacity-40 rounded-xl p-5 border border-purple-500">
-              <h3 className="font-bold text-yellow-300 mb-4 text-center flex items-center justify-center gap-2"><PixelIcon src={UI_PIXEL_ICONS.score} alt="records" className="w-4 h-4" />記録</h3>
-              <div className="space-y-3">
-                <div className="flex items-center justify-between bg-black bg-opacity-30 rounded-lg px-4 py-3">
-                  <div className="flex items-center gap-2">
-                    <PixelIcon src={UI_PIXEL_ICONS.click} alt="tap" className="w-5 h-5" />
-                    <span className="text-sm text-gray-300">総タップ数</span>
-                  </div>
-                  <span className="font-bold text-white text-lg">{fmt(totalClicks)}回</span>
+            <div className="p-4" style={{background:"rgba(8,6,14,0.95)", border:"1px solid rgba(123,45,139,0.4)", borderLeft:"3px solid var(--dc-purple)"}}>
+              <div className="dc-section-title" style={{color:"#c084fc"}}>📊 記録</div>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between px-3 py-2" style={{background:"rgba(20,10,30,0.8)", border:"1px solid rgba(123,45,139,0.25)"}}>
+                  <span className="text-sm" style={{color:"var(--dc-muted)"}}>👆 総タップ数</span>
+                  <span className="font-bold" style={{color:"var(--dc-text)"}}>{fmt(totalClicks)}回</span>
                 </div>
-                <div className="flex items-center justify-between bg-black bg-opacity-30 rounded-lg px-4 py-3">
-                  <div className="flex items-center gap-2">
-                    <PixelIcon src={UI_PIXEL_ICONS.prestige} alt="prestige" className="w-5 h-5" />
-                    <span className="text-sm text-gray-300">総転生回数</span>
-                  </div>
-                  <span className="font-bold text-white text-lg">{prestige}回</span>
+                <div className="flex items-center justify-between px-3 py-2" style={{background:"rgba(20,10,30,0.8)", border:"1px solid rgba(123,45,139,0.25)"}}>
+                  <span className="text-sm" style={{color:"var(--dc-muted)"}}>🔄 総転生回数</span>
+                  <span className="font-bold" style={{color:"#fb923c"}}>{prestige}回</span>
                 </div>
               </div>
             </div>
@@ -3170,10 +3164,11 @@ function MagicClicker() {
               </div>
             </div>
             {isEndContentReached && (
-              <div className="bg-black bg-opacity-40 rounded-xl p-5 border border-amber-500 text-center">
-                <h3 className="font-bold text-amber-300 mb-2 flex items-center justify-center gap-2"><PixelIcon src={UI_PIXEL_ICONS.end} alt="end" className="w-4 h-4" />エンド到達</h3>
-                <p className="text-xs opacity-70 mb-3">全検定クリア済み。最初からやり直せます。</p>
-                <button onClick={resetFromBeginning} className="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-black rounded-lg font-bold text-sm">最初からやり直す</button>
+              <div className="p-5 text-center" style={{background:"rgba(14,10,4,0.95)", border:"2px solid var(--dc-gold)", boxShadow:"0 0 30px rgba(200,146,42,0.25) inset"}}>
+                <div style={{fontSize:"2rem", marginBottom:"0.4rem"}}>👑</div>
+                <div className="dc-section-title justify-center" style={{color:"var(--dc-gold)", fontSize:"1rem"}}>エンドコンテンツ到達</div>
+                <p className="text-xs mb-4" style={{color:"var(--dc-muted)"}}>全検定クリア済み。最初からやり直せます。</p>
+                <button onClick={resetFromBeginning} className="dc-btn dc-btn-gold px-5 py-2 font-bold text-sm">🔁 最初からやり直す</button>
               </div>
             )}
           </div>
@@ -3182,80 +3177,98 @@ function MagicClicker() {
         {/* スコアボードタブ */}
         {activeTab==="scoreboard" && (
           <div className="max-w-4xl mx-auto space-y-4">
-            <div className="bg-black bg-opacity-40 rounded-xl p-5 border border-yellow-500">
-              <h3 className="font-bold text-yellow-300 mb-3 flex items-center gap-2"><PixelIcon src={UI_PIXEL_ICONS.score} alt="score" className="w-4 h-4" />現在のスコア</h3>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
-                <div className="bg-black bg-opacity-30 rounded-lg p-3"><div className="opacity-70">総合スコア</div><div className="font-bold text-yellow-300 text-base">{fmt(currentScore)}</div></div>
-                <div className="bg-black bg-opacity-30 rounded-lg p-3"><div className="opacity-70">累計マナ</div><div className="font-bold text-purple-300 text-base">{fmt(totalManaAllWorlds)}</div></div>
-                <div className="bg-black bg-opacity-30 rounded-lg p-3"><div className="opacity-70">転生pt</div><div className="font-bold text-orange-300 text-base">{fmt(prestigePts)}</div></div>
-                <div className="bg-black bg-opacity-30 rounded-lg p-3"><div className="opacity-70">検定合格</div><div className="font-bold text-green-300 text-base">{passedExams.length}回</div></div>
+            {/* 現在のスコア */}
+            <div className="p-4" style={{background:"rgba(10,8,4,0.95)", border:"1px solid rgba(200,146,42,0.5)", borderTop:"3px solid var(--dc-gold)"}}>
+              <div className="dc-section-title">🏆 現在のスコア</div>
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <div className="px-3 py-2.5" style={{background:"rgba(20,14,4,0.85)", border:"1px solid rgba(200,146,42,0.25)", borderLeft:"2px solid var(--dc-gold)"}}>
+                  <div style={{color:"var(--dc-muted)"}}>総合スコア</div>
+                  <div className="font-bold text-base" style={{color:"var(--dc-gold)"}}>{fmt(currentScore)}</div>
+                </div>
+                <div className="px-3 py-2.5" style={{background:"rgba(12,6,20,0.85)", border:"1px solid rgba(123,45,139,0.3)", borderLeft:"2px solid var(--dc-purple)"}}>
+                  <div style={{color:"var(--dc-muted)"}}>累計マナ</div>
+                  <div className="font-bold text-base" style={{color:"#c084fc"}}>{fmt(totalManaAllWorlds)}</div>
+                </div>
+                <div className="px-3 py-2.5" style={{background:"rgba(18,8,4,0.85)", border:"1px solid rgba(192,57,43,0.3)", borderLeft:"2px solid var(--dc-red)"}}>
+                  <div style={{color:"var(--dc-muted)"}}>転生pt</div>
+                  <div className="font-bold text-base" style={{color:"#fb923c"}}>{fmt(prestigePts)}</div>
+                </div>
+                <div className="px-3 py-2.5" style={{background:"rgba(4,14,8,0.85)", border:"1px solid rgba(34,197,94,0.3)", borderLeft:"2px solid #22c55e"}}>
+                  <div style={{color:"var(--dc-muted)"}}>検定合格</div>
+                  <div className="font-bold text-base" style={{color:"#4ade80"}}>{passedExams.length}回</div>
+                </div>
               </div>
-              <div className="flex gap-2 mt-3">
-                <div className="text-xs opacity-70">オンラインランキングはこのタブの「オンラインに送信」で登録します。</div>
-              </div>
+              <p className="text-xs mt-2" style={{color:"var(--dc-muted)"}}>「オンラインに送信」でランキング登録できます。</p>
             </div>
 
-            <div className="bg-black bg-opacity-40 rounded-xl p-5 border border-cyan-500">
-              <h3 className="font-bold text-cyan-300 mb-3 flex items-center gap-2"><PixelIcon src={UI_PIXEL_ICONS.world} alt="world ranking" className="w-4 h-4" />オンラインランキング設定</h3>
-              <div className="grid grid-cols-1 gap-2">
+            {/* オンラインランキング設定 */}
+            <div className="p-4" style={{background:"rgba(4,10,16,0.95)", border:"1px solid rgba(34,211,238,0.4)", borderLeft:"3px solid #22d3ee"}}>
+              <div className="dc-section-title" style={{color:"#22d3ee"}}>⚙️ オンラインランキング設定</div>
+              <div className="space-y-2">
                 <input
                   type="text"
                   value={supabaseUrl}
                   onChange={e=>setSupabaseUrl(e.target.value)}
                   placeholder="https://xxxx.supabase.co"
-                  className="w-full bg-black bg-opacity-40 border border-cyan-700 rounded px-3 py-2 text-sm"
+                  style={{width:"100%", background:"rgba(0,0,0,0.6)", border:"1px solid rgba(34,211,238,0.4)", color:"var(--dc-text)", padding:"0.4rem 0.75rem", fontSize:"0.8rem", fontFamily:"inherit", outline:"none"}}
                 />
                 <input
                   type="password"
                   value={supabaseAnonKey}
                   onChange={e=>setSupabaseAnonKey(e.target.value)}
                   placeholder="Supabase anon key"
-                  className="w-full bg-black bg-opacity-40 border border-cyan-700 rounded px-3 py-2 text-sm"
+                  style={{width:"100%", background:"rgba(0,0,0,0.6)", border:"1px solid rgba(34,211,238,0.4)", color:"var(--dc-text)", padding:"0.4rem 0.75rem", fontSize:"0.8rem", fontFamily:"inherit", outline:"none"}}
                 />
               </div>
               <div className="flex flex-wrap gap-2 mt-3">
                 <button onClick={submitOnlineScore} disabled={onlineBusy || !canUseOnline}
-                  className={`px-4 py-2 rounded-md font-bold text-sm border-2 shadow-[0_0_0_2px_rgba(0,0,0,0.35)] ${onlineBusy || !canUseOnline ? "bg-slate-700 text-slate-300 border-slate-500 cursor-not-allowed" : "bg-amber-400 hover:bg-amber-300 text-black border-amber-100"}`}>
-                  {onlineBusy ? "送信中..." : "オンラインに送信"}
+                  className={`dc-btn dc-btn-gold px-4 py-1.5 font-bold text-sm${onlineBusy || !canUseOnline ? " opacity-40 cursor-not-allowed" : ""}`}>
+                  {onlineBusy ? "送信中..." : "📤 オンラインに送信"}
                 </button>
                 <button onClick={fetchOnlineScores} disabled={onlineBusy || !canUseOnline}
-                  className={`px-4 py-2 rounded-lg font-bold text-sm ${onlineBusy || !canUseOnline ? "bg-gray-700 text-gray-400 cursor-not-allowed" : "bg-blue-500 hover:bg-blue-400 text-black"}`}>
-                  {onlineBusy ? "更新中..." : "世界ランキング更新"}
+                  className={`dc-btn px-4 py-1.5 font-bold text-sm${onlineBusy || !canUseOnline ? " opacity-40 cursor-not-allowed" : ""}`} style={{borderColor:"rgba(34,211,238,0.6)", color:"#22d3ee"}}>
+                  {onlineBusy ? "更新中..." : "🔄 世界ランキング更新"}
                 </button>
               </div>
-              <p className={`text-xs mt-2 ${onlineRealtimeActive ? "text-emerald-300" : "text-gray-400"}`}>
-                Realtime: {onlineRealtimeActive ? "接続中（自動更新ON）" : "未接続"} {onlineRealtimeStatus ? `(${onlineRealtimeStatus})` : ""}
+              <p className="text-xs mt-2" style={{color: onlineRealtimeActive ? "#4ade80" : "var(--dc-muted)"}}>
+                Realtime: {onlineRealtimeActive ? "🟢 接続中（自動更新ON）" : "⚫ 未接続"} {onlineRealtimeStatus ? `(${onlineRealtimeStatus})` : ""}
               </p>
-              <p className="text-xs text-cyan-200 mt-2">
+              <p className="text-xs mt-1" style={{color:"#67e8f9"}}>
                 参加方法: ①名前を決める → ②ゲームを進める → ③「オンラインに送信」を押す
               </p>
-              {onlineError && <p className="text-red-300 text-xs mt-2">{onlineError}</p>}
-              <p className="text-xs opacity-70 mt-2">
-                Supabase側に `scores` テーブルが必要です（`name text, score int, prestige int, prestige_pts int, exams int, clicks bigint, total_mana bigint, total_crystals bigint, total_souls bigint, created_at timestamptz default now()`）。
+              {onlineError && <p className="text-xs mt-2" style={{color:"var(--dc-red)"}}>{onlineError}</p>}
+              <p className="text-xs mt-2" style={{color:"var(--dc-muted)"}}>
+                Supabase側に `scores` テーブルが必要です。
               </p>
             </div>
 
-            <div className="bg-black bg-opacity-40 rounded-xl p-5 border border-blue-500">
-              <h3 className="font-bold text-blue-300 mb-3 flex items-center gap-2"><PixelIcon src={UI_PIXEL_ICONS.world} alt="world ranking" className="w-4 h-4" />世界ランキング TOP {ONLINE_RANK_LIMIT}</h3>
-              <div className="space-y-2 max-h-96 overflow-y-auto pr-1">
+            {/* 世界ランキング */}
+            <div className="p-4" style={{background:"rgba(4,8,16,0.95)", border:"1px solid rgba(99,102,241,0.5)", borderTop:"3px solid #6366f1"}}>
+              <div className="dc-section-title" style={{color:"#a5b4fc"}}>🌍 世界ランキング TOP {ONLINE_RANK_LIMIT}</div>
+              <div className="space-y-1.5 max-h-96 overflow-y-auto pr-1">
                 {onlineScores.length===0 && (
-                  <p className="text-sm text-gray-400">まだ取得されていません。「世界ランキング更新」を押してください。</p>
+                  <p className="text-sm py-4 text-center" style={{color:"var(--dc-muted)"}}>まだ取得されていません。「世界ランキング更新」を押してください。</p>
                 )}
                 {onlineScores.map((row, idx)=>(
-                  <div key={`${row.name}_${row.created_at||idx}`} className="bg-black bg-opacity-30 rounded-lg px-3 py-2 border border-white border-opacity-10">
+                  <div key={`${row.name}_${row.created_at||idx}`} className="px-3 py-2" style={{
+                    background: idx===0 ? "rgba(20,14,4,0.9)" : idx===1 ? "rgba(10,10,14,0.9)" : idx===2 ? "rgba(12,6,4,0.9)" : "rgba(8,6,12,0.8)",
+                    border: "1px solid rgba(99,102,241,0.2)",
+                    borderLeft: idx===0 ? "3px solid var(--dc-gold)" : idx===1 ? "3px solid #9ca3af" : idx===2 ? "3px solid #b45309" : "3px solid rgba(99,102,241,0.4)",
+                  }}>
                     <div className="flex items-center justify-between gap-2">
                       <button
                         onClick={() => openOnlinePlayerDetail(row, idx + 1)}
-                        className="text-sm font-bold text-left hover:text-cyan-200 transition-colors"
+                        className="text-sm font-bold text-left"
+                        style={{color: idx===0 ? "var(--dc-gold)" : idx<3 ? "#e2e8f0" : "var(--dc-text)", fontFamily:"'Courier New',monospace"}}
                       >
-                        <span className="text-cyan-300 mr-2">#{idx+1}</span>{row.name || "名無し"}
+                        <span style={{color: idx===0 ? "var(--dc-gold)" : idx===1 ? "#9ca3af" : idx===2 ? "#cd853f" : "var(--dc-muted)"}} className="mr-2">#{idx+1}</span>{row.name || "名無し"}
                       </button>
-                      <div className="text-cyan-300 font-bold">{fmt(row.score || 0)}</div>
+                      <div className="font-bold text-sm" style={{color:"#a5b4fc"}}>{fmt(row.score || 0)}</div>
                     </div>
-                    <div className="text-xs opacity-70 mt-1">
-                      転生{row.prestige||0}回 / 転生pt {fmt(row.prestige_pts||0)} / クリック {fmt(row.clicks||0)} / 結晶{fmt(row.total_crystals||0)} / 魂{fmt(row.total_souls||0)} / 検定{row.exams||0}回
+                    <div className="text-xs mt-0.5" style={{color:"var(--dc-muted)"}}>
+                      転生{row.prestige||0}回 / pt {fmt(row.prestige_pts||0)} / 🖱{fmt(row.clicks||0)} / 💎{fmt(row.total_crystals||0)} / 👻{fmt(row.total_souls||0)} / 📝{row.exams||0}回
                     </div>
-                    <div className="text-xs opacity-50 mt-1">
+                    <div className="text-xs mt-0.5" style={{color:"rgba(120,100,80,0.7)"}}>
                       {row.created_at ? new Date(row.created_at).toLocaleString("ja-JP") : "-"}
                     </div>
                   </div>
@@ -3263,9 +3276,10 @@ function MagicClicker() {
               </div>
             </div>
 
-            <div className="bg-black bg-opacity-40 rounded-xl p-5 border border-emerald-500">
-              <h3 className="font-bold text-emerald-300 mb-3 flex items-center gap-2"><PixelIcon src={UI_PIXEL_ICONS.ad} alt="ad" className="w-4 h-4" />広告エリア</h3>
-              <div className="bg-black bg-opacity-30 rounded-lg p-4 text-xs opacity-80">
+            {/* 広告エリア */}
+            <div className="p-4" style={{background:"rgba(4,10,8,0.9)", border:"1px solid rgba(34,197,94,0.3)", borderLeft:"3px solid #22c55e"}}>
+              <div className="dc-section-title" style={{color:"#4ade80"}}>📢 広告エリア</div>
+              <div className="px-3 py-3 text-xs" style={{color:"var(--dc-muted)", background:"rgba(0,0,0,0.3)", border:"1px solid rgba(34,197,94,0.15)"}}>
                 ここに広告コード（AdSense等）を設置できます。現在は準備中です。
               </div>
             </div>
@@ -3274,44 +3288,59 @@ function MagicClicker() {
 
         {/* ランキング詳細モーダル */}
         {selectedOnlinePlayer && (
-          <div className="fixed inset-0 z-50 bg-black bg-opacity-70 flex items-center justify-center p-4">
-            <div className="w-full max-w-2xl bg-slate-950 bg-opacity-95 border border-cyan-500 rounded-xl p-5">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{background:"rgba(0,0,0,0.85)"}}>
+            <div className="w-full max-w-2xl p-5" style={{background:"var(--dc-bg)", border:"2px solid rgba(34,211,238,0.6)", boxShadow:"0 0 40px rgba(34,211,238,0.15)"}}>
               <div className="flex items-start justify-between gap-3 mb-4">
                 <div>
-                  <div className="text-cyan-300 text-sm font-bold">ランキング詳細</div>
-                  <div className="text-xl font-bold text-white">
+                  <div className="text-xs font-bold uppercase tracking-widest mb-1" style={{color:"#22d3ee"}}>ランキング詳細</div>
+                  <div style={{fontSize:"1.3rem", fontWeight:900, color:"var(--dc-gold)", fontFamily:"'Courier New',monospace", letterSpacing:"0.06em"}}>
                     #{selectedOnlinePlayer.rank} {selectedOnlinePlayer.row.name || "名無し"}
                   </div>
                 </div>
                 <button
                   onClick={closeOnlinePlayerDetail}
-                  className="px-3 py-1.5 rounded bg-gray-700 hover:bg-gray-600 text-sm font-bold"
+                  className="dc-btn px-3 py-1.5 text-sm font-bold"
                 >
-                  閉じる
+                  ✕ 閉じる
                 </button>
               </div>
 
               <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs mb-4">
-                <div className="bg-black bg-opacity-40 rounded p-2"><div className="opacity-70">総合スコア</div><div className="font-bold text-cyan-300">{fmt(selectedOnlinePlayer.row.score || 0)}</div></div>
-                <div className="bg-black bg-opacity-40 rounded p-2"><div className="opacity-70">転生回数</div><div className="font-bold">{fmt(selectedOnlinePlayer.row.prestige || 0)}</div></div>
-                <div className="bg-black bg-opacity-40 rounded p-2"><div className="opacity-70">検定合格</div><div className="font-bold">{fmt(selectedOnlinePlayer.row.exams || 0)}</div></div>
-                <div className="bg-black bg-opacity-40 rounded p-2"><div className="opacity-70">世界数(推定)</div><div className="font-bold">{fmt(selectedOnlinePlayer.stats.worlds)}</div></div>
+                <div className="px-2 py-2" style={{background:"rgba(10,8,4,0.9)", border:"1px solid rgba(200,146,42,0.3)", borderLeft:"2px solid var(--dc-gold)"}}>
+                  <div style={{color:"var(--dc-muted)"}}>総合スコア</div>
+                  <div className="font-bold" style={{color:"var(--dc-gold)"}}>{fmt(selectedOnlinePlayer.row.score || 0)}</div>
+                </div>
+                <div className="px-2 py-2" style={{background:"rgba(10,4,4,0.9)", border:"1px solid rgba(192,57,43,0.3)", borderLeft:"2px solid var(--dc-red)"}}>
+                  <div style={{color:"var(--dc-muted)"}}>転生回数</div>
+                  <div className="font-bold" style={{color:"#fb923c"}}>{fmt(selectedOnlinePlayer.row.prestige || 0)}</div>
+                </div>
+                <div className="px-2 py-2" style={{background:"rgba(4,10,4,0.9)", border:"1px solid rgba(34,197,94,0.3)", borderLeft:"2px solid #22c55e"}}>
+                  <div style={{color:"var(--dc-muted)"}}>検定合格</div>
+                  <div className="font-bold" style={{color:"#4ade80"}}>{fmt(selectedOnlinePlayer.row.exams || 0)}</div>
+                </div>
+                <div className="px-2 py-2" style={{background:"rgba(4,4,14,0.9)", border:"1px solid rgba(99,102,241,0.3)", borderLeft:"2px solid #6366f1"}}>
+                  <div style={{color:"var(--dc-muted)"}}>世界数(推定)</div>
+                  <div className="font-bold" style={{color:"#a5b4fc"}}>{fmt(selectedOnlinePlayer.stats.worlds)}</div>
+                </div>
               </div>
 
-              <div className="bg-black bg-opacity-35 rounded-lg p-3 border border-amber-500">
-                <div className="font-bold text-amber-300 mb-2">
-                  <span className="inline-flex items-center gap-2"><PixelIcon src={UI_PIXEL_ICONS.achievement} alt="achievement" className="w-4 h-4" />実績 {selectedOnlineAchievements.length}/{ACHIEVEMENTS.length}</span>
-                </div>
-                <div className="max-h-60 overflow-y-auto space-y-2 pr-1">
+              <div className="p-3" style={{background:"rgba(10,7,4,0.9)", border:"1px solid rgba(200,146,42,0.35)"}}>
+                <div className="dc-section-title">🏅 実績 {selectedOnlineAchievements.length}/{ACHIEVEMENTS.length}</div>
+                <div className="max-h-60 overflow-y-auto space-y-1 pr-1">
                   {ACHIEVEMENTS.map(a => {
                     const unlocked = selectedOnlineAchievements.some(x => x.id === a.id);
                     const hiddenLocked = a.hidden && !unlocked;
                     return (
-                      <div key={`remote_${a.id}`} className={`rounded px-3 py-2 border ${unlocked ? "bg-amber-900 bg-opacity-25 border-amber-400" : "bg-black bg-opacity-25 border-gray-700"}`}>
-                        <div className={`text-sm font-bold ${unlocked ? "text-amber-200" : "text-gray-300"}`}>
-                          <span className="inline-flex items-center gap-1"><PixelIcon src={unlocked ? UI_PIXEL_ICONS.check : UI_PIXEL_ICONS.lock} alt={unlocked ? "open" : "locked"} className="w-3.5 h-3.5" />{hiddenLocked ? "？？？" : a.name}</span>
+                      <div key={`remote_${a.id}`} className="px-2.5 py-1.5" style={{
+                        background: unlocked ? "rgba(20,14,4,0.9)" : "rgba(8,6,6,0.7)",
+                        border: unlocked ? "1px solid rgba(200,146,42,0.4)" : "1px solid rgba(40,30,20,0.5)",
+                        borderLeft: unlocked ? "3px solid var(--dc-gold)" : "3px solid rgba(60,40,20,0.4)",
+                      }}>
+                        <div className="text-sm font-bold flex items-center gap-1" style={{color:unlocked?"#fbbf24":"var(--dc-muted)"}}>
+                          <span>{unlocked ? "✅" : "🔒"}</span>
+                          <span>{hiddenLocked ? "？？？" : a.name}</span>
                         </div>
-                        <div className="text-xs opacity-70 mt-1">
+                        <div className="text-xs mt-0.5" style={{color:"var(--dc-muted)"}}>
                           {hiddenLocked ? "解除条件は秘密です" : a.desc}
                         </div>
                       </div>
@@ -3320,7 +3349,7 @@ function MagicClicker() {
                 </div>
               </div>
 
-              <div className="text-xs opacity-60 mt-3">
+              <div className="text-xs mt-3" style={{color:"rgba(100,80,60,0.8)"}}>
                 ※ 実績判定はランキングの公開データから計算しています（世界数は検定回数から推定）。
               </div>
             </div>
