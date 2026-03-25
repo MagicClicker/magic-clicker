@@ -1,2 +1,2 @@
-magic clicker
-hello
+this is a Magic clicker
+Have fun!
