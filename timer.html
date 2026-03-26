@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>タイマー</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #0a0a0f;
+      color: #e0e0ff;
+      font-family: 'Courier New', monospace;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      gap: 32px;
+    }
+
+    h1 {
+      font-size: 18px;
+      letter-spacing: 6px;
+      text-transform: uppercase;
+      color: #7070ff;
+      text-shadow: 0 0 12px #4040ff;
+    }
+
+    /* タブ */
+    .tabs {
+      display: flex;
+      gap: 4px;
+      background: #111122;
+      border: 1px solid #2a2a4a;
+      border-radius: 6px;
+      padding: 4px;
+    }
+
+    .tab {
+      padding: 8px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 13px;
+      letter-spacing: 2px;
+      background: none;
+      color: #6060aa;
+      border: none;
+      transition: all 0.2s;
+    }
+
+    .tab.active {
+      background: #2020aa;
+      color: #e0e0ff;
+      box-shadow: 0 0 10px #2020aa88;
+    }
+
+    .tab:hover:not(.active) {
+      color: #a0a0ff;
+    }
+
+    /* パネル共通 */
+    .panel {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .panel.active { display: flex; }
+
+    /* ディスプレイ */
+    .display {
+      font-size: 72px;
+      font-weight: bold;
+      letter-spacing: 4px;
+      color: #a0a0ff;
+      text-shadow: 0 0 20px #4040ff, 0 0 40px #2020aa;
+      min-width: 320px;
+      text-align: center;
+      transition: color 0.3s;
+    }
+
+    .display.danger {
+      color: #ff4444;
+      text-shadow: 0 0 20px #ff2200, 0 0 40px #aa1100;
+      animation: pulse 0.5s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+
+    /* ボタン */
+    .btn-row {
+      display: flex;
+      gap: 12px;
+    }
+
+    .btn {
+      padding: 10px 28px;
+      border: 1px solid #3030aa;
+      border-radius: 4px;
+      background: #0f0f2a;
+      color: #a0a0ff;
+      font-family: inherit;
+      font-size: 13px;
+      letter-spacing: 2px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn:hover {
+      background: #1a1a44;
+      border-color: #6060ff;
+      box-shadow: 0 0 8px #3030aa;
+    }
+
+    .btn.primary {
+      background: #1a1acc;
+      border-color: #4040ff;
+      color: #ffffff;
+    }
+
+    .btn.primary:hover {
+      background: #2020ee;
+      box-shadow: 0 0 12px #4040ff;
+    }
+
+    .btn.danger-btn {
+      border-color: #aa2222;
+      color: #ff6666;
+    }
+
+    .btn.danger-btn:hover {
+      background: #2a0f0f;
+      border-color: #ff4444;
+      box-shadow: 0 0 8px #aa2222;
+    }
+
+    /* タイマー入力 */
+    .time-inputs {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .time-input-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .time-input-group label {
+      font-size: 11px;
+      letter-spacing: 2px;
+      color: #5050aa;
+    }
+
+    .time-input-group input {
+      width: 64px;
+      text-align: center;
+      background: #0f0f2a;
+      border: 1px solid #2a2a4a;
+      color: #a0a0ff;
+      font-family: inherit;
+      font-size: 28px;
+      padding: 6px;
+      border-radius: 4px;
+      outline: none;
+    }
+
+    .time-input-group input:focus {
+      border-color: #4040ff;
+      box-shadow: 0 0 8px #2020aa44;
+    }
+
+    .colon {
+      font-size: 36px;
+      color: #4040aa;
+      margin-top: -16px;
+    }
+
+    /* ストップウォッチのラップ */
+    .laps {
+      max-height: 200px;
+      overflow-y: auto;
+      width: 300px;
+    }
+
+    .laps::-webkit-scrollbar { width: 4px; }
+    .laps::-webkit-scrollbar-track { background: #0f0f2a; }
+    .laps::-webkit-scrollbar-thumb { background: #3030aa; border-radius: 2px; }
+
+    .lap-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 6px 12px;
+      border-bottom: 1px solid #1a1a3a;
+      font-size: 14px;
+      color: #8080cc;
+    }
+
+    .lap-item:first-child { color: #a0a0ff; }
+
+    .lap-num { color: #4040aa; font-size: 12px; }
+
+    /* ポモドーロ */
+    .pomodoro-status {
+      font-size: 13px;
+      letter-spacing: 3px;
+      color: #5050aa;
+    }
+
+    .pomodoro-status.work { color: #ff8844; }
+    .pomodoro-status.break { color: #44ff88; }
+
+    .pomodoro-count {
+      display: flex;
+      gap: 8px;
+    }
+
+    .tomato {
+      font-size: 20px;
+      opacity: 0.3;
+      transition: opacity 0.3s;
+    }
+
+    .tomato.done { opacity: 1; }
+
+    /* プログレスバー */
+    .progress-bar {
+      width: 300px;
+      height: 3px;
+      background: #1a1a3a;
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #2020aa, #6060ff);
+      border-radius: 2px;
+      transition: width 1s linear;
+      box-shadow: 0 0 6px #4040ff;
+    }
+
+    /* 通知 */
+    .toast {
+      position: fixed;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: #1a1a44;
+      border: 1px solid #4040aa;
+      padding: 12px 24px;
+      border-radius: 6px;
+      font-size: 14px;
+      letter-spacing: 2px;
+      color: #a0a0ff;
+      box-shadow: 0 0 20px #2020aa44;
+      transition: transform 0.3s ease;
+      pointer-events: none;
+    }
+
+    .toast.show { transform: translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body>
+
+<h1>Timer</h1>
+
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('countdown')">カウントダウン</button>
+  <button class="tab" onclick="switchTab('stopwatch')">ストップウォッチ</button>
+  <button class="tab" onclick="switchTab('pomodoro')">ポモドーロ</button>
+</div>
+
+<!-- カウントダウン -->
+<div id="panel-countdown" class="panel active">
+  <div class="time-inputs" id="countdown-inputs">
+    <div class="time-input-group">
+      <label>時</label>
+      <input type="number" id="in-h" min="0" max="23" value="0" oninput="clampInput(this,0,23)">
+    </div>
+    <div class="colon">:</div>
+    <div class="time-input-group">
+      <label>分</label>
+      <input type="number" id="in-m" min="0" max="59" value="5" oninput="clampInput(this,0,59)">
+    </div>
+    <div class="colon">:</div>
+    <div class="time-input-group">
+      <label>秒</label>
+      <input type="number" id="in-s" min="0" max="59" value="0" oninput="clampInput(this,0,59)">
+    </div>
+  </div>
+
+  <div class="display" id="countdown-display">00:05:00</div>
+
+  <div class="progress-bar">
+    <div class="progress-fill" id="countdown-progress" style="width:100%"></div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn primary" id="countdown-start-btn" onclick="countdownStart()">スタート</button>
+    <button class="btn" onclick="countdownReset()">リセット</button>
+  </div>
+</div>
+
+<!-- ストップウォッチ -->
+<div id="panel-stopwatch" class="panel">
+  <div class="display" id="sw-display">00:00:00.00</div>
+
+  <div class="btn-row">
+    <button class="btn primary" id="sw-start-btn" onclick="swToggle()">スタート</button>
+    <button class="btn" onclick="swLap()" id="sw-lap-btn">ラップ</button>
+    <button class="btn danger-btn" onclick="swReset()">リセット</button>
+  </div>
+
+  <div class="laps" id="laps"></div>
+</div>
+
+<!-- ポモドーロ -->
+<div id="panel-pomodoro" class="panel">
+  <div class="pomodoro-count" id="pomo-tomatoes">
+    <span class="tomato">🍅</span>
+    <span class="tomato">🍅</span>
+    <span class="tomato">🍅</span>
+    <span class="tomato">🍅</span>
+  </div>
+
+  <div class="pomodoro-status" id="pomo-status">WORK</div>
+  <div class="display" id="pomo-display">25:00</div>
+
+  <div class="progress-bar">
+    <div class="progress-fill" id="pomo-progress" style="width:100%"></div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn primary" id="pomo-start-btn" onclick="pomoToggle()">スタート</button>
+    <button class="btn danger-btn" onclick="pomoReset()">リセット</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ---- ユーティリティ ----
+function pad(n, d=2) { return String(n).padStart(d, '0'); }
+
+function clampInput(el, min, max) {
+  let v = parseInt(el.value) || 0;
+  if (v < min) el.value = min;
+  if (v > max) el.value = max;
+  updateCountdownDisplay();
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+function beep(freq=880, dur=0.5, type='sine') {
+  try {
+    const ctx = new AudioContext();
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.connect(g); g.connect(ctx.destination);
+    o.frequency.value = freq;
+    o.type = type;
+    g.gain.setValueAtTime(0.4, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
+    o.start(); o.stop(ctx.currentTime + dur);
+    setTimeout(() => ctx.close(), (dur + 0.1) * 1000);
+  } catch(e) {}
+}
+
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach((t,i) => {
+    t.classList.toggle('active', ['countdown','stopwatch','pomodoro'][i] === name);
+  });
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+}
+
+// ---- カウントダウン ----
+let cdInterval = null;
+let cdRemaining = 0;
+let cdTotal = 0;
+let cdRunning = false;
+
+function getInputSeconds() {
+  const h = parseInt(document.getElementById('in-h').value) || 0;
+  const m = parseInt(document.getElementById('in-m').value) || 0;
+  const s = parseInt(document.getElementById('in-s').value) || 0;
+  return h * 3600 + m * 60 + s;
+}
+
+function updateCountdownDisplay() {
+  const secs = getInputSeconds();
+  const h = Math.floor(secs / 3600);
+  const m = Math.floor((secs % 3600) / 60);
+  const s = secs % 60;
+  document.getElementById('countdown-display').textContent = `${pad(h)}:${pad(m)}:${pad(s)}`;
+}
+
+function renderCountdown(secs) {
+  const h = Math.floor(secs / 3600);
+  const m = Math.floor((secs % 3600) / 60);
+  const s = secs % 60;
+  const el = document.getElementById('countdown-display');
+  el.textContent = `${pad(h)}:${pad(m)}:${pad(s)}`;
+  el.classList.toggle('danger', secs <= 10 && secs > 0);
+  const pct = cdTotal > 0 ? (secs / cdTotal) * 100 : 100;
+  document.getElementById('countdown-progress').style.width = pct + '%';
+}
+
+function countdownStart() {
+  if (cdRunning) {
+    // 一時停止
+    clearInterval(cdInterval);
+    cdRunning = false;
+    document.getElementById('countdown-start-btn').textContent = '再開';
+    document.getElementById('countdown-inputs').style.pointerEvents = 'none';
+    document.getElementById('countdown-inputs').style.opacity = '0.4';
+    return;
+  }
+
+  if (cdRemaining === 0) {
+    cdRemaining = getInputSeconds();
+    cdTotal = cdRemaining;
+    if (cdRemaining === 0) return;
+  }
+
+  document.getElementById('countdown-inputs').style.pointerEvents = 'none';
+  document.getElementById('countdown-inputs').style.opacity = '0.4';
+  document.getElementById('countdown-start-btn').textContent = '一時停止';
+  cdRunning = true;
+
+  cdInterval = setInterval(() => {
+    cdRemaining--;
+    renderCountdown(cdRemaining);
+    if (cdRemaining <= 0) {
+      clearInterval(cdInterval);
+      cdRunning = false;
+      document.getElementById('countdown-start-btn').textContent = 'スタート';
+      document.getElementById('countdown-inputs').style.pointerEvents = '';
+      document.getElementById('countdown-inputs').style.opacity = '1';
+      beep(660, 0.3); setTimeout(() => beep(880, 0.5), 350);
+      showToast('⏰ タイマー終了！');
+      cdRemaining = 0;
+    }
+  }, 1000);
+}
+
+function countdownReset() {
+  clearInterval(cdInterval);
+  cdRunning = false;
+  cdRemaining = 0;
+  cdTotal = 0;
+  document.getElementById('countdown-start-btn').textContent = 'スタート';
+  document.getElementById('countdown-inputs').style.pointerEvents = '';
+  document.getElementById('countdown-inputs').style.opacity = '1';
+  updateCountdownDisplay();
+  document.getElementById('countdown-progress').style.width = '100%';
+  document.getElementById('countdown-display').classList.remove('danger');
+}
+
+// 入力変更でリアルタイム更新
+['in-h','in-m','in-s'].forEach(id => {
+  document.getElementById(id).addEventListener('input', updateCountdownDisplay);
+});
+updateCountdownDisplay();
+
+// ---- ストップウォッチ ----
+let swRunning = false;
+let swInterval = null;
+let swElapsed = 0;   // ms
+let swLapStart = 0;
+let swLaps = [];
+
+function renderSW(ms) {
+  const total = ms;
+  const cs = Math.floor((total % 1000) / 10);
+  const s  = Math.floor(total / 1000) % 60;
+  const m  = Math.floor(total / 60000) % 60;
+  const h  = Math.floor(total / 3600000);
+  document.getElementById('sw-display').textContent =
+    `${pad(h)}:${pad(m)}:${pad(s)}.${pad(cs)}`;
+}
+
+function swToggle() {
+  if (swRunning) {
+    clearInterval(swInterval);
+    swRunning = false;
+    document.getElementById('sw-start-btn').textContent = '再開';
+  } else {
+    const start = Date.now() - swElapsed;
+    swInterval = setInterval(() => {
+      swElapsed = Date.now() - start;
+      renderSW(swElapsed);
+    }, 10);
+    swRunning = true;
+    document.getElementById('sw-start-btn').textContent = '停止';
+  }
+}
+
+function swLap() {
+  if (!swRunning && swElapsed === 0) return;
+  const lapTime = swElapsed - swLapStart;
+  swLapStart = swElapsed;
+  swLaps.unshift({ n: swLaps.length + 1, lap: lapTime, total: swElapsed });
+  renderLaps();
+}
+
+function renderLaps() {
+  const el = document.getElementById('laps');
+  el.innerHTML = swLaps.map((l, i) => {
+    const lt = l.lap;
+    const cs = Math.floor((lt % 1000) / 10);
+    const s  = Math.floor(lt / 1000) % 60;
+    const m  = Math.floor(lt / 60000);
+    const tt = l.total;
+    const tcs = Math.floor((tt % 1000) / 10);
+    const ts  = Math.floor(tt / 1000) % 60;
+    const tm  = Math.floor(tt / 60000);
+    return `<div class="lap-item">
+      <span class="lap-num">Lap ${l.n}</span>
+      <span>${pad(m)}:${pad(s)}.${pad(cs)}</span>
+      <span style="color:#3a3a6a">${pad(tm)}:${pad(ts)}.${pad(tcs)}</span>
+    </div>`;
+  }).join('');
+}
+
+function swReset() {
+  clearInterval(swInterval);
+  swRunning = false;
+  swElapsed = 0;
+  swLapStart = 0;
+  swLaps = [];
+  renderSW(0);
+  renderLaps();
+  document.getElementById('sw-start-btn').textContent = 'スタート';
+}
+
+// ---- ポモドーロ ----
+const POMO_WORK  = 25 * 60;
+const POMO_SHORT = 5  * 60;
+const POMO_LONG  = 15 * 60;
+
+let pomoRunning = false;
+let pomoInterval = null;
+let pomoRemaining = POMO_WORK;
+let pomoPhase = 'work'; // 'work' | 'short' | 'long'
+let pomoCount = 0;      // 完了したポモドーロ数
+let pomoTotal = POMO_WORK;
+
+function renderPomo(secs) {
+  const m = Math.floor(secs / 60);
+  const s = secs % 60;
+  document.getElementById('pomo-display').textContent = `${pad(m)}:${pad(s)}`;
+  const pct = pomoTotal > 0 ? (secs / pomoTotal) * 100 : 100;
+  document.getElementById('pomo-progress').style.width = pct + '%';
+
+  // トマト更新
+  const tomatoes = document.querySelectorAll('.tomato');
+  tomatoes.forEach((t, i) => t.classList.toggle('done', i < (pomoCount % 4)));
+}
+
+function pomoToggle() {
+  if (pomoRunning) {
+    clearInterval(pomoInterval);
+    pomoRunning = false;
+    document.getElementById('pomo-start-btn').textContent = '再開';
+    return;
+  }
+
+  pomoRunning = true;
+  document.getElementById('pomo-start-btn').textContent = '一時停止';
+
+  pomoInterval = setInterval(() => {
+    pomoRemaining--;
+    renderPomo(pomoRemaining);
+    if (pomoRemaining <= 0) {
+      clearInterval(pomoInterval);
+      pomoRunning = false;
+      document.getElementById('pomo-start-btn').textContent = 'スタート';
+
+      if (pomoPhase === 'work') {
+        pomoCount++;
+        beep(660, 0.2); setTimeout(() => beep(880, 0.3), 250);
+        if (pomoCount % 4 === 0) {
+          pomoPhase = 'long';
+          pomoRemaining = POMO_LONG;
+          pomoTotal = POMO_LONG;
+          document.getElementById('pomo-status').textContent = 'LONG BREAK';
+          document.getElementById('pomo-status').className = 'pomodoro-status break';
+          showToast('🍅 4セット完了！長い休憩 (15分)');
+        } else {
+          pomoPhase = 'short';
+          pomoRemaining = POMO_SHORT;
+          pomoTotal = POMO_SHORT;
+          document.getElementById('pomo-status').textContent = 'BREAK';
+          document.getElementById('pomo-status').className = 'pomodoro-status break';
+          showToast('🍅 作業完了！休憩 (5分)');
+        }
+      } else {
+        beep(440, 0.2); setTimeout(() => beep(550, 0.3), 250);
+        pomoPhase = 'work';
+        pomoRemaining = POMO_WORK;
+        pomoTotal = POMO_WORK;
+        document.getElementById('pomo-status').textContent = 'WORK';
+        document.getElementById('pomo-status').className = 'pomodoro-status work';
+        showToast('☕ 休憩終了！作業を始めましょう');
+      }
+      renderPomo(pomoRemaining);
+    }
+  }, 1000);
+}
+
+function pomoReset() {
+  clearInterval(pomoInterval);
+  pomoRunning = false;
+  pomoPhase = 'work';
+  pomoCount = 0;
+  pomoRemaining = POMO_WORK;
+  pomoTotal = POMO_WORK;
+  document.getElementById('pomo-start-btn').textContent = 'スタート';
+  document.getElementById('pomo-status').textContent = 'WORK';
+  document.getElementById('pomo-status').className = 'pomodoro-status';
+  renderPomo(POMO_WORK);
+}
+</script>
+</body>
+</html>
