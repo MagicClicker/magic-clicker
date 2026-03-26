@@ -171,12 +171,17 @@
       padding: 6px;
       border-radius: 4px;
       outline: none;
+      cursor: ns-resize;
     }
 
     .time-input-group input:focus {
       border-color: #4040ff;
       box-shadow: 0 0 8px #2020aa44;
     }
+
+    .time-input-group input::-webkit-inner-spin-button,
+    .time-input-group input::-webkit-outer-spin-button { -webkit-appearance: none; }
+    .time-input-group input[type=number] { -moz-appearance: textfield; }
 
     .colon {
       font-size: 36px;
@@ -274,7 +279,7 @@
 <h1>Timer</h1>
 
 <div class="tabs">
-  <button class="tab active" onclick="switchTab('countdown')">カウントダウン</button>
+  <button class="tab active" onclick="switchTab('countdown')">タイマー</button>
   <button class="tab" onclick="switchTab('stopwatch')">ストップウォッチ</button>
   <button class="tab" onclick="switchTab('pomodoro')">ポモドーロ</button>
 </div>
@@ -472,9 +477,25 @@ function countdownReset() {
   document.getElementById('countdown-display').classList.remove('danger');
 }
 
-// 入力変更でリアルタイム更新
-['in-h','in-m','in-s'].forEach(id => {
-  document.getElementById(id).addEventListener('input', updateCountdownDisplay);
+// 入力変更でリアルタイム更新 + スクロール操作
+const cdInputDefs = [
+  { id: 'in-h', min: 0, max: 23 },
+  { id: 'in-m', min: 0, max: 59 },
+  { id: 'in-s', min: 0, max: 59 },
+];
+cdInputDefs.forEach(({ id, min, max }) => {
+  const el = document.getElementById(id);
+  el.addEventListener('input', updateCountdownDisplay);
+  el.addEventListener('wheel', (e) => {
+    if (cdRunning) return;
+    e.preventDefault();
+    let v = parseInt(el.value) || 0;
+    v += e.deltaY < 0 ? 1 : -1;
+    if (v < min) v = min;
+    if (v > max) v = max;
+    el.value = v;
+    updateCountdownDisplay();
+  }, { passive: false });
 });
 updateCountdownDisplay();
 
@@ -558,8 +579,11 @@ let pomoRunning = false;
 let pomoInterval = null;
 let pomoRemaining = POMO_WORK;
 let pomoPhase = 'work'; // 'work' | 'short' | 'long'
-let pomoCount = 0;      // 完了したポモドーロ数
+let pomoCount = 0;
 let pomoTotal = POMO_WORK;
+let pomoAlarming = false;
+let pomoAlarmLoop = null;
+let pomoAlarmAutoStop = null;
 
 function renderPomo(secs) {
   const m = Math.floor(secs / 60);
@@ -567,13 +591,56 @@ function renderPomo(secs) {
   document.getElementById('pomo-display').textContent = `${pad(m)}:${pad(s)}`;
   const pct = pomoTotal > 0 ? (secs / pomoTotal) * 100 : 100;
   document.getElementById('pomo-progress').style.width = pct + '%';
-
-  // トマト更新
   const tomatoes = document.querySelectorAll('.tomato');
   tomatoes.forEach((t, i) => t.classList.toggle('done', i < (pomoCount % 4)));
 }
 
+// onBreak=true: 休憩開始音、false: 休憩終了音
+function pomoAlarmStart(onBreak) {
+  pomoAlarming = true;
+  const btn = document.getElementById('pomo-start-btn');
+  btn.textContent = '次へ ▶';
+  btn.onclick = () => { pomoAlarmStop(); pomoBeginNext(); };
+
+  // 繰り返し音
+  function ring() {
+    if (onBreak) {
+      beep(880, 0.18); setTimeout(() => beep(1100, 0.22), 220);
+    } else {
+      beep(550, 0.18); setTimeout(() => beep(440, 0.22), 220);
+    }
+  }
+  ring();
+  pomoAlarmLoop = setInterval(ring, 900);
+
+  // 15秒で自動停止（次フェーズは手動スタート待ち）
+  pomoAlarmAutoStop = setTimeout(() => {
+    pomoAlarmStop();
+    // ボタンをスタートに戻すだけ（自動開始しない）
+    const b = document.getElementById('pomo-start-btn');
+    b.textContent = 'スタート';
+    b.onclick = pomoToggle;
+  }, 15000);
+}
+
+function pomoAlarmStop() {
+  clearInterval(pomoAlarmLoop);
+  clearTimeout(pomoAlarmAutoStop);
+  pomoAlarmLoop = null;
+  pomoAlarmAutoStop = null;
+  pomoAlarming = false;
+}
+
+// アラーム後に次フェーズを即スタート
+function pomoBeginNext() {
+  const btn = document.getElementById('pomo-start-btn');
+  btn.onclick = pomoToggle;
+  pomoToggle(); // 次フェーズをスタート
+}
+
 function pomoToggle() {
+  if (pomoAlarming) return;
+
   if (pomoRunning) {
     clearInterval(pomoInterval);
     pomoRunning = false;
@@ -590,11 +657,9 @@ function pomoToggle() {
     if (pomoRemaining <= 0) {
       clearInterval(pomoInterval);
       pomoRunning = false;
-      document.getElementById('pomo-start-btn').textContent = 'スタート';
 
       if (pomoPhase === 'work') {
         pomoCount++;
-        beep(660, 0.2); setTimeout(() => beep(880, 0.3), 250);
         if (pomoCount % 4 === 0) {
           pomoPhase = 'long';
           pomoRemaining = POMO_LONG;
@@ -610,14 +675,15 @@ function pomoToggle() {
           document.getElementById('pomo-status').className = 'pomodoro-status break';
           showToast('🍅 作業完了！休憩 (5分)');
         }
+        pomoAlarmStart(true);  // 休憩開始アラーム
       } else {
-        beep(440, 0.2); setTimeout(() => beep(550, 0.3), 250);
         pomoPhase = 'work';
         pomoRemaining = POMO_WORK;
         pomoTotal = POMO_WORK;
         document.getElementById('pomo-status').textContent = 'WORK';
         document.getElementById('pomo-status').className = 'pomodoro-status work';
         showToast('☕ 休憩終了！作業を始めましょう');
+        pomoAlarmStart(false); // 休憩終了アラーム
       }
       renderPomo(pomoRemaining);
     }
@@ -626,12 +692,15 @@ function pomoToggle() {
 
 function pomoReset() {
   clearInterval(pomoInterval);
+  pomoAlarmStop();
   pomoRunning = false;
   pomoPhase = 'work';
   pomoCount = 0;
   pomoRemaining = POMO_WORK;
   pomoTotal = POMO_WORK;
-  document.getElementById('pomo-start-btn').textContent = 'スタート';
+  const btn = document.getElementById('pomo-start-btn');
+  btn.textContent = 'スタート';
+  btn.onclick = pomoToggle;
   document.getElementById('pomo-status').textContent = 'WORK';
   document.getElementById('pomo-status').className = 'pomodoro-status';
   renderPomo(POMO_WORK);
